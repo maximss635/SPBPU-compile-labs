@@ -3,7 +3,7 @@
 
 #include "y.tab.h" 
 
-extern int lastNum;
+extern char lastNum[128];
 extern char lastVarName[128];
 
 %}
@@ -49,7 +49,7 @@ while                           return WHILE;
 >>                              return BIT_RIGHT_SHIFT;
 \%                              return MOD;
 
-[0-9]*                          lastNum = atoi(yytext);         return NUMBER;
+[0-9]*                          strcpy(lastNum, yytext);    return NUMBER;
 [a-zA-Z][a-zA-Z0-9]*            strcpy(lastVarName, yytext);    return VAR;
 
 %% 

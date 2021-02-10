@@ -1,3 +1,29 @@
-MOV	b, R1
-here
-LEA	R1, 2
+PUSH	2
+POP	c
+PUSH	c
+POP	b
+PUSH	b
+POP	a
+
+PUSH	b
+PUSH	1
+PUSH	c
+PUSH	2
+PUSH	d
+POP	TMP
+POP	a
+SUB	a, TMP
+PUSH	a
+POP	TMP
+POP	a
+ADD	a, TMP
+PUSH	a
+POP	TMP
+POP	a
+SUB	a, TMP
+PUSH	a
+POP	TMP
+POP	a
+ADD	a, TMP
+PUSH	a
+POP	a

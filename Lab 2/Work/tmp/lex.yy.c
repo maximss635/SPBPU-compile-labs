@@ -487,7 +487,7 @@ char *yytext;
 
 #include "y.tab.h" 
 
-extern int lastNum;
+extern char lastNum[128];
 extern char lastVarName[128];
 
 #line 493 "lex.yy.c"
@@ -921,7 +921,7 @@ return MOD;
 case 31:
 YY_RULE_SETUP
 #line 52 "src/lexic.l"
-lastNum = atoi(yytext);         return NUMBER;
+strcpy(lastNum, yytext);    return NUMBER;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP

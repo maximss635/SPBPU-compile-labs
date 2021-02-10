@@ -5,12 +5,27 @@
 void yyerror(char *s) ;
 int yylex();        // ???? 
 
-int lastNum;
+char lastNum[128];
 char lastVarName[128];
-char assignLeftOperand[128];
+
+struct Stack {
+    char data[32][128];
+    int i;
+};
+
+void push_stack(struct Stack* stack, char* s) 
+{
+    strcpy(stack->data[stack->i++], s);
+}
+
+char* pop_stack(struct Stack* stack)
+{
+    return stack->data[--stack->i];
+}
+
+struct Stack assignLeftOperands;
 
 extern FILE* yyin;
-
 FILE* fout;
 int numError = 0;
 %} 
@@ -25,9 +40,8 @@ commands:
 
 command:
     PRINT expr SEMICOLON { fprintf(fout, "CALL\tprint\n"); } |
-    RETURN expr SEMICOLON { fprintf(fout, "RET"); } |
-    assigment SEMICOLON /*{ printf("assigment\n"); }*/ |
-    expr SEMICOLON { /*printf("expr");*/ } |
+    RETURN expr SEMICOLON { fprintf(fout, "RET\n"); } |
+    assigment SEMICOLON |
     
     condition |
 
@@ -54,29 +68,46 @@ cycle_while:
     WHILE OPEN expr CLOSE
     body;
 
-assigment:
-    VAR { strcpy(assignLeftOperand, lastVarName); }
-    ASSIGN expr 
-    { fprintf(fout, "MOV\t%s, R1\n", assignLeftOperand); };
-
 expr:
     OPEN expr CLOSE |
     binary_operation |
     unary_operation |
     assigment |
-    VAR |
-    NUMBER { fprintf(fout, "LEA\tR1, %d\n", lastNum); } ;
+    VAR { fprintf(fout, "PUSH\t%s\n", lastVarName); }|
+    NUMBER { fprintf(fout, "PUSH\t%s\n", lastNum); };
+
+assigment:
+    VAR { push_stack(&assignLeftOperands, lastVarName); }  
+    ASSIGN expr { 
+        char* varName = pop_stack(&assignLeftOperands);
+        fprintf(fout, "POP\t%s\n", varName); 
+        if (assignLeftOperands.i) {
+            fprintf(fout, "PUSH\t%s\n", varName);
+        }
+    } ;
 
 unary_operation:
     INC expr | expr INC |
     DEC expr | expr DEC |
     ADD expr | SUB expr;
 
-binary_operation:
+binary_operation: 
     comparation |
     
-    expr ADD expr |
-    expr SUB expr |
+    expr ADD expr { 
+        char* varName = assignLeftOperands.data[assignLeftOperands.i - 1];
+        fprintf(fout, "POP\tTMP\n");
+        fprintf(fout, "POP\t%s\n", varName);
+        fprintf(fout, "ADD\t%s, TMP\n", varName);
+        fprintf(fout, "PUSH\t%s\n", varName); 
+    } |
+    expr SUB expr {
+        char* varName = assignLeftOperands.data[assignLeftOperands.i - 1];
+        fprintf(fout, "POP\tTMP\n");
+        fprintf(fout, "POP\t%s\n", varName);
+        fprintf(fout, "SUB\t%s, TMP\n", varName);
+        fprintf(fout, "PUSH\t%s\n", varName); 
+    } |
     expr MUL expr |
     expr DIV expr |
     
@@ -129,6 +160,8 @@ int main(int argc, void *argv[])
     }
 
     fout = fopen(argv[3], "w");
+
+    assignLeftOperands.i = 0;
 
     yyparse();
     fclose(yyin);
