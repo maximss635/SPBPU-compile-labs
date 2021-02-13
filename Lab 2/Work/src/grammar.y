@@ -21,42 +21,6 @@ struct SolverStack stack;
 struct SolverStack tmp;
 enum NodeKind lastExprKind;
 
-int getOperatorPriority(const char* operator) {
-    
-    static const char priorityTable[11][11][4] = {
-        {"*", "/", "%"},
-        {"+", "-"},
-        {">>", "<<"},
-        {">=", "<=", ">", "<"},
-        {"==", "!="},
-        {"&"},
-        {"^"},
-        {"|"},
-        {"&&"},
-        {"||"},
-        {"=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "^=", "|="},
-    };
-
-    for (int i = 0; i < 11; ++i) {
-        for (int j = 0; j < 11; ++j) {
-            if (!strcmp(priorityTable[i][j], operator)) {
-                return 11 - i;
-            }
-        }
-    }
-
-    return 0;
-}
-
-void tmpStackPrint() {
-    fprintf(fout, "[stack: ");
-    for (struct Node* i = stack.begin; i != NULL; i = i->next) {
-        fprintf(fout, "%s ", i->elem);
-    }
-    fprintf(fout, "]\n");
-
-}
-
 %} 
 
 %start commands
@@ -90,14 +54,17 @@ semicolon:
             stack_pushBack(&stack, n.elem, n.kind);
         }
 
-        tmpStackPrint();
-
+        stack_run(&stack, fout);
         stack_clear(&stack);
     };
 
 command:
-    PRINT expr semicolon |
-    RETURN expr semicolon |
+    PRINT expr semicolon {
+        fprintf(fout, "CALL\tprint\n");
+    } |
+    RETURN expr semicolon {
+        fprintf(fout, "RET\tR1\n");
+    } |
     
     expr semicolon |
     
@@ -261,15 +228,12 @@ int main(int argc, void *argv[])
         printf("No such file: %s\n", pathFile);
 	    return -1;
     }
-
-    fprintf(fout, "[start]\n");
     
     stack_init(&stack);
     stack_init(&tmp);
 
     yyparse();
 
-    fprintf(fout, "[finish]\n");
 
     fclose(yyin);
     fclose(fout);

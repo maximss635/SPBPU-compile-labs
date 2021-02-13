@@ -1,3 +1,14 @@
-[start]
-[stack: 1 r 4 / + ]
-[finish]
+MOV	R1, b
+MUL	R1, c
+MOV R2, R1
+MOV	R1, a
+ADD	R1, R2
+MOV R3, R1
+MOV	C, R3
+MOV	B, C
+MOV	A, B
+MOV	R1, b
+ADD	R1, 1
+MOV R2, R1
+MOV	R1, R2
+CALL	print

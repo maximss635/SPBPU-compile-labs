@@ -1,1 +1,3 @@
-return 1 + r / 4;
+A = B = C = a + b * c;
+
+print b + 1;
