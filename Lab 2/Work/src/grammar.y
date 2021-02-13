@@ -2,51 +2,107 @@
 #include <stdio.h>  
 #include <string.h>
 
+#include "SolverStack.h"
+
 void yyerror(char *s) ;
 int yylex();        // ???? 
 
-char lastNum[128];
-char lastVarName[128];
-
-struct Stack {
-    char data[32][128];
-    int i;
-};
-
-void push_stack(struct Stack* stack, char* s) 
-{
-    strcpy(stack->data[stack->i++], s);
-}
-
-char* pop_stack(struct Stack* stack)
-{
-    return stack->data[--stack->i];
-}
-
-struct Stack assignLeftOperands;
-
 extern FILE* yyin;
 FILE* fout;
+
+char lastVarName[128];
+char lastNumber[128];
+
+char lastBinOperator[5] = "";
+
 int numError = 0;
+
+struct SolverStack stack;
+struct SolverStack tmp;
+enum NodeKind lastExprKind;
+
+int getOperatorPriority(const char* operator) {
+    
+    static const char priorityTable[11][11][4] = {
+        {"*", "/", "%"},
+        {"+", "-"},
+        {">>", "<<"},
+        {">=", "<=", ">", "<"},
+        {"==", "!="},
+        {"&"},
+        {"^"},
+        {"|"},
+        {"&&"},
+        {"||"},
+        {"=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "^=", "|="},
+    };
+
+    for (int i = 0; i < 11; ++i) {
+        for (int j = 0; j < 11; ++j) {
+            if (!strcmp(priorityTable[i][j], operator)) {
+                return 11 - i;
+            }
+        }
+    }
+
+    return 0;
+}
+
+void tmpStackPrint() {
+    fprintf(fout, "[stack: ");
+    for (struct Node* i = stack.begin; i != NULL; i = i->next) {
+        fprintf(fout, "%s ", i->elem);
+    }
+    fprintf(fout, "]\n");
+
+}
+
 %} 
 
 %start commands
-%token NUMBER VAR ASSIGN SEMICOLON IF OPEN CLOSE OBRACE EBRACE COMPARE ELSE_IF ELSE PRINT ADD SUB MUL DIV WHILE RETURN CHANGE DEC INC AND OR BIT_AND BIT_OR BIT_XOR BIT_LEFT_SHIFT BIT_RIGHT_SHIFT MOD
+
+%token OPEN CLOSE OBRACE EBRACE
+%token NUMBER VAR 
+%token SEMICOLON 
+%token IF ELSE_IF ELSE WHILE 
+%token PRINT RETURN 
+%token ADD SUB MUL DIV AND OR 
+%token BIT_AND BIT_OR BIT_XOR 
+%token BIT_LEFT_SHIFT BIT_RIGHT_SHIFT MOD
+%token DEC INC
+%token ASSIGN 
+%token IS_EQUAL IS_NOT_EQUAL 
+%token IS_LESS IS_MORE IS_LEQUAL IS_MEQUAL
+%token AASS SASS MASS DASS
 
 %% 
 commands: 
     /* empty */ | 
     commands command;
 
+semicolon:
+    SEMICOLON semicolon |
+    SEMICOLON {
+
+        struct Node n;
+        while (!stack_isEmpty(&tmp)) {
+            n = stack_popBack(&tmp);
+            stack_pushBack(&stack, n.elem, n.kind);
+        }
+
+        tmpStackPrint();
+
+        stack_clear(&stack);
+    };
+
 command:
-    PRINT expr SEMICOLON { fprintf(fout, "CALL\tprint\n"); } |
-    RETURN expr SEMICOLON { fprintf(fout, "RET\n"); } |
-    assigment SEMICOLON |
+    PRINT expr semicolon |
+    RETURN expr semicolon |
+    
+    expr semicolon |
     
     condition |
-
-    cycle_while
-    ;
+    cycle_while;
 
 body:
     OBRACE commands EBRACE;
@@ -68,64 +124,107 @@ cycle_while:
     WHILE OPEN expr CLOSE
     body;
 
-expr:
-    OPEN expr CLOSE |
-    binary_operation |
-    unary_operation |
-    assigment |
-    VAR { fprintf(fout, "PUSH\t%s\n", lastVarName); }|
-    NUMBER { fprintf(fout, "PUSH\t%s\n", lastNum); };
+var_or_number:
+    VAR {
+        lastExprKind = var;
+        stack_pushBack(&stack, lastVarName, var);
+    } | 
+    NUMBER {
+        lastExprKind = num;
+        stack_pushBack(&stack, lastNumber, num);
+    };
 
-assigment:
-    VAR { push_stack(&assignLeftOperands, lastVarName); }  
-    ASSIGN expr { 
-        char* varName = pop_stack(&assignLeftOperands);
-        fprintf(fout, "POP\t%s\n", varName); 
-        if (assignLeftOperands.i) {
-            fprintf(fout, "PUSH\t%s\n", varName);
+expr:
+    var_or_number |
+    OPEN {
+        stack_pushBack(&tmp, "(", open_parenthesis);
+    }
+    expr 
+    CLOSE {
+        struct Node n;
+        
+        while (true) {
+            n = stack_popBack(&tmp);
+            if (n.kind == open_parenthesis) {
+                break;
+            }
+            stack_pushBack(&stack, n.elem, n.kind);
         }
-    } ;
+
+    } |
+    
+    expr 
+    binary_operator {
+        
+        struct Node e;
+        while (!stack_isEmpty(&tmp)) {
+            bool compare;
+            if (!strcmp("=", lastBinOperator)) {
+                compare = (
+                    getOperatorPriority(lastBinOperator) <
+                    getOperatorPriority(tmp.end->elem)
+                );
+            } else {
+                compare = (
+                    getOperatorPriority(lastBinOperator) <=
+                    getOperatorPriority(tmp.end->elem)
+                );
+            }
+            if (!compare) {
+                break;
+            }
+
+            e = stack_popBack(&tmp);
+            stack_pushBack(&stack, e.elem, e.kind);
+        }
+
+        stack_pushBack(&tmp, lastBinOperator, operator);
+    }
+    expr |
+    
+    unary_operation;
 
 unary_operation:
     INC expr | expr INC |
     DEC expr | expr DEC |
     ADD expr | SUB expr;
 
-binary_operation: 
-    comparation |
+binary_operator:
+    ASSIGN { 
+        if (lastExprKind == num) {
+            yyerror("syntax error");
+            exit(1);
+        }
+        strcpy(lastBinOperator, "="); 
+    } | 
     
-    expr ADD expr { 
-        char* varName = assignLeftOperands.data[assignLeftOperands.i - 1];
-        fprintf(fout, "POP\tTMP\n");
-        fprintf(fout, "POP\t%s\n", varName);
-        fprintf(fout, "ADD\t%s, TMP\n", varName);
-        fprintf(fout, "PUSH\t%s\n", varName); 
-    } |
-    expr SUB expr {
-        char* varName = assignLeftOperands.data[assignLeftOperands.i - 1];
-        fprintf(fout, "POP\tTMP\n");
-        fprintf(fout, "POP\t%s\n", varName);
-        fprintf(fout, "SUB\t%s, TMP\n", varName);
-        fprintf(fout, "PUSH\t%s\n", varName); 
-    } |
-    expr MUL expr |
-    expr DIV expr |
+    IS_EQUAL { strcpy(lastBinOperator, "=="); } |     
+    IS_NOT_EQUAL { strcpy(lastBinOperator, "!="); } |     
+    IS_MORE { strcpy(lastBinOperator, ">"); } |     
+    IS_LESS { strcpy(lastBinOperator, "<"); } |     
+    IS_MEQUAL { strcpy(lastBinOperator, ">="); } |     
+    IS_LEQUAL { strcpy(lastBinOperator, "<="); } |     
     
-    expr CHANGE expr |
+    ADD { strcpy(lastBinOperator, "+"); } | 
+    SUB { strcpy(lastBinOperator, "-"); }| 
+    MUL { strcpy(lastBinOperator, "*"); }| 
+    DIV { strcpy(lastBinOperator, "/"); }| 
     
-    expr AND expr |
-    expr OR expr |
-
-    expr BIT_AND expr |
-    expr BIT_OR expr |
-    expr BIT_XOR expr |
-    expr BIT_LEFT_SHIFT expr |
-    expr BIT_RIGHT_SHIFT expr |
-    expr MOD expr;
-
-comparation:
-    expr COMPARE expr;
-
+    AASS { strcpy(lastBinOperator, "+="); } |      
+    SASS { strcpy(lastBinOperator, "-="); } |      
+    MASS { strcpy(lastBinOperator, "*="); } |      
+    DASS { strcpy(lastBinOperator, "/="); } |      
+    
+    AND { strcpy(lastBinOperator, "&&"); } | 
+    OR { strcpy(lastBinOperator, "||"); } | 
+    
+    BIT_AND { strcpy(lastBinOperator, "&"); } | 
+    BIT_OR { strcpy(lastBinOperator, "|"); } | 
+    BIT_XOR { strcpy(lastBinOperator, "^"); } | 
+    BIT_RIGHT_SHIFT { strcpy(lastBinOperator, ">>"); } | 
+    BIT_LEFT_SHIFT { strcpy(lastBinOperator, "<<"); } |
+    
+    MOD { strcpy(lastBinOperator, "%"); };
 %% 
 
 void yyerror(char *s) 
@@ -145,7 +244,7 @@ int main(int argc, void *argv[])
 {
     yylval = 0;
 
-    if (4 != argc || strcmp("-o", argv[2])) {
+    if (4 != argc || strcmp("-o", argv[2]) != 0) {
         printf("Incorrect arguments\n");
         printf("Usage: ./compile [path src] -o [path asm]\n");
         
@@ -154,18 +253,25 @@ int main(int argc, void *argv[])
 
     char* pathFile = argv[1];
     yyin = fopen(pathFile,"r");
+
+    char* pathAsmFile = argv[3];
+    fout = fopen(pathAsmFile, "w");
+
     if (NULL == yyin) {
         printf("No such file: %s\n", pathFile);
 	    return -1;
     }
 
-    fout = fopen(argv[3], "w");
-
-    assignLeftOperands.i = 0;
+    fprintf(fout, "[start]\n");
+    
+    stack_init(&stack);
+    stack_init(&tmp);
 
     yyparse();
-    fclose(yyin);
 
+    fprintf(fout, "[finish]\n");
+
+    fclose(yyin);
     fclose(fout);
 
     return 0; 

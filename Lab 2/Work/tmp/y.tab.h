@@ -54,36 +54,44 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    NUMBER = 258,                  /* NUMBER  */
-    VAR = 259,                     /* VAR  */
-    ASSIGN = 260,                  /* ASSIGN  */
-    SEMICOLON = 261,               /* SEMICOLON  */
-    IF = 262,                      /* IF  */
-    OPEN = 263,                    /* OPEN  */
-    CLOSE = 264,                   /* CLOSE  */
-    OBRACE = 265,                  /* OBRACE  */
-    EBRACE = 266,                  /* EBRACE  */
-    COMPARE = 267,                 /* COMPARE  */
-    ELSE_IF = 268,                 /* ELSE_IF  */
-    ELSE = 269,                    /* ELSE  */
-    PRINT = 270,                   /* PRINT  */
+    OPEN = 258,                    /* OPEN  */
+    CLOSE = 259,                   /* CLOSE  */
+    OBRACE = 260,                  /* OBRACE  */
+    EBRACE = 261,                  /* EBRACE  */
+    NUMBER = 262,                  /* NUMBER  */
+    VAR = 263,                     /* VAR  */
+    SEMICOLON = 264,               /* SEMICOLON  */
+    IF = 265,                      /* IF  */
+    ELSE_IF = 266,                 /* ELSE_IF  */
+    ELSE = 267,                    /* ELSE  */
+    WHILE = 268,                   /* WHILE  */
+    PRINT = 269,                   /* PRINT  */
+    RETURN = 270,                  /* RETURN  */
     ADD = 271,                     /* ADD  */
     SUB = 272,                     /* SUB  */
     MUL = 273,                     /* MUL  */
     DIV = 274,                     /* DIV  */
-    WHILE = 275,                   /* WHILE  */
-    RETURN = 276,                  /* RETURN  */
-    CHANGE = 277,                  /* CHANGE  */
-    DEC = 278,                     /* DEC  */
-    INC = 279,                     /* INC  */
-    AND = 280,                     /* AND  */
-    OR = 281,                      /* OR  */
-    BIT_AND = 282,                 /* BIT_AND  */
-    BIT_OR = 283,                  /* BIT_OR  */
-    BIT_XOR = 284,                 /* BIT_XOR  */
-    BIT_LEFT_SHIFT = 285,          /* BIT_LEFT_SHIFT  */
-    BIT_RIGHT_SHIFT = 286,         /* BIT_RIGHT_SHIFT  */
-    MOD = 287                      /* MOD  */
+    AND = 275,                     /* AND  */
+    OR = 276,                      /* OR  */
+    BIT_AND = 277,                 /* BIT_AND  */
+    BIT_OR = 278,                  /* BIT_OR  */
+    BIT_XOR = 279,                 /* BIT_XOR  */
+    BIT_LEFT_SHIFT = 280,          /* BIT_LEFT_SHIFT  */
+    BIT_RIGHT_SHIFT = 281,         /* BIT_RIGHT_SHIFT  */
+    MOD = 282,                     /* MOD  */
+    DEC = 283,                     /* DEC  */
+    INC = 284,                     /* INC  */
+    ASSIGN = 285,                  /* ASSIGN  */
+    IS_EQUAL = 286,                /* IS_EQUAL  */
+    IS_NOT_EQUAL = 287,            /* IS_NOT_EQUAL  */
+    IS_LESS = 288,                 /* IS_LESS  */
+    IS_MORE = 289,                 /* IS_MORE  */
+    IS_LEQUAL = 290,               /* IS_LEQUAL  */
+    IS_MEQUAL = 291,               /* IS_MEQUAL  */
+    AASS = 292,                    /* AASS  */
+    SASS = 293,                    /* SASS  */
+    MASS = 294,                    /* MASS  */
+    DASS = 295                     /* DASS  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -91,36 +99,44 @@ extern int yydebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define NUMBER 258
-#define VAR 259
-#define ASSIGN 260
-#define SEMICOLON 261
-#define IF 262
-#define OPEN 263
-#define CLOSE 264
-#define OBRACE 265
-#define EBRACE 266
-#define COMPARE 267
-#define ELSE_IF 268
-#define ELSE 269
-#define PRINT 270
+#define OPEN 258
+#define CLOSE 259
+#define OBRACE 260
+#define EBRACE 261
+#define NUMBER 262
+#define VAR 263
+#define SEMICOLON 264
+#define IF 265
+#define ELSE_IF 266
+#define ELSE 267
+#define WHILE 268
+#define PRINT 269
+#define RETURN 270
 #define ADD 271
 #define SUB 272
 #define MUL 273
 #define DIV 274
-#define WHILE 275
-#define RETURN 276
-#define CHANGE 277
-#define DEC 278
-#define INC 279
-#define AND 280
-#define OR 281
-#define BIT_AND 282
-#define BIT_OR 283
-#define BIT_XOR 284
-#define BIT_LEFT_SHIFT 285
-#define BIT_RIGHT_SHIFT 286
-#define MOD 287
+#define AND 275
+#define OR 276
+#define BIT_AND 277
+#define BIT_OR 278
+#define BIT_XOR 279
+#define BIT_LEFT_SHIFT 280
+#define BIT_RIGHT_SHIFT 281
+#define MOD 282
+#define DEC 283
+#define INC 284
+#define ASSIGN 285
+#define IS_EQUAL 286
+#define IS_NOT_EQUAL 287
+#define IS_LESS 288
+#define IS_MORE 289
+#define IS_LEQUAL 290
+#define IS_MEQUAL 291
+#define AASS 292
+#define SASS 293
+#define MASS 294
+#define DASS 295
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
