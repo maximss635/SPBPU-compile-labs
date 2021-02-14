@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "RegisterAllocator.h"
 
 struct SolverStack {
     struct Node {
@@ -19,23 +20,21 @@ struct SolverStack {
 
         struct Node* next;
         struct Node* prev;
-    };
+    } *begin, *end;
 
-    struct Node* begin;
-    struct Node* end;
     int size;
 };
 
-void stack_init(struct SolverStack* stack) {
+void stackInit(struct SolverStack* stack) {
     stack->size = 0;
     stack->begin = stack->end = NULL;
 }
 
-bool stack_isEmpty(const struct SolverStack* stack) {
+bool stackIsEmpty(const struct SolverStack* stack) {
     return 0 == stack->size;
 }
 
-void stack_pushBack(struct SolverStack* stack, const char* newElem,
+void stackPushBack(struct SolverStack* stack, const char* newElem,
     const enum NodeKind newElemKind) {
 
     struct Node *newNode = (struct Node *)
@@ -45,7 +44,7 @@ void stack_pushBack(struct SolverStack* stack, const char* newElem,
     strcpy(newNode->elem, newElem);
     newNode->next = NULL;
 
-    if (!stack_isEmpty(stack)) {
+    if (!stackIsEmpty(stack)) {
         stack->end->next = newNode;
         newNode->prev = stack->end;
         stack->end = newNode;
@@ -57,8 +56,8 @@ void stack_pushBack(struct SolverStack* stack, const char* newElem,
     ++stack->size;
 }
 
-struct Node stack_popBack(struct SolverStack* stack) {
-    if (stack_isEmpty(stack)) {
+struct Node stackPopBack(struct SolverStack* stack) {
+    if (stackIsEmpty(stack)) {
         struct Node n;
         return n;
     }
@@ -84,9 +83,9 @@ struct Node stack_popBack(struct SolverStack* stack) {
     return toReturn;
 }
 
-void stack_clear(struct SolverStack* stack) {
-    while (!stack_isEmpty(stack)) {
-        stack_popBack(stack);
+void stackClear(struct SolverStack* stack) {
+    while (!stackIsEmpty(stack)) {
+        stackPopBack(stack);
     }
 }
 
@@ -103,7 +102,12 @@ int getOperatorPriority(const char* operator) {
         {"|"},
         {"&&"},
         {"||"},
-        {"=", "+=", "-=", "*=", "/=", "%=", "<<=", ">>=", "&=", "^=", "|="},
+        {
+            "=", "+=", "-=", 
+            "*=", "/=", "%=", 
+            "<<=", ">>=", "&=", 
+            "^=", "|="
+        },
     };
 
     for (int i = 0; i < 11; ++i) {
@@ -128,12 +132,16 @@ char* getAsmCommand(const char* operator) {
         return "DIV";
     
     // to continue
+    return "...";
 }   
 
-void stack_run(const struct SolverStack* stack, FILE* fout) {
+void stackRun(const struct SolverStack* stack, FILE* fout) {
     
     struct SolverStack tmp;
-    stack_init(&tmp);
+    stackInit(&tmp);
+
+    struct RegisterAllocator regAllocator;
+    regAllocatorInit(&regAllocator);
 
     int regNumResult = 1;
     char r[16];
@@ -146,38 +154,45 @@ void stack_run(const struct SolverStack* stack, FILE* fout) {
         n = n->next) {
 
         if (n->kind == num || n->kind == var) {
-            stack_pushBack(&tmp, n->elem, n->kind);
+            stackPushBack(&tmp, n->elem, n->kind);
             continue;
         }
 
         if (n->kind == operator) {
             if (!strcmp("=", n->elem)) {
-                struct Node rightArg = stack_popBack(&tmp);
-                struct Node leftArg = stack_popBack(&tmp);
+                struct Node rightArg = stackPopBack(&tmp);
+                struct Node leftArg = stackPopBack(&tmp);
 
-                fprintf(fout, "MOV\t%s, %s\n", leftArg.elem, rightArg.elem);
-                stack_pushBack(&tmp, leftArg.elem, leftArg.kind);
+                fprintf(fout, "MOV\t\t%s, %s\n", 
+                    leftArg.elem, rightArg.elem);
+                
+                stackPushBack(&tmp, leftArg.elem, leftArg.kind);
 
                 wasAssigment = true;
             } else {
-                struct Node rightArg = stack_popBack(&tmp);
-                struct Node leftArg = stack_popBack(&tmp);
+                struct Node rightArg = stackPopBack(&tmp);
+                struct Node leftArg = stackPopBack(&tmp);
 
-                // fprintf(fout, "[l=%s, r=%s]\n", leftArg.elem, rightArg.elem);
+                if (leftArg.kind == num) {
+                    fprintf(fout, "LDI\t\tR1, %s\n", leftArg.elem);
+                }
+                else if (leftArg.kind == var || leftArg.kind == reg) {
+                    fprintf(fout, "MOV\t\tR1, %s\n", leftArg.elem);
+                    
+                    regAllocatorFree(
+                        &regAllocator, (int)(leftArg.elem[1] - '0'));
+                }
 
-                if (leftArg.kind == num)
-                    fprintf(fout, "LDI\tR1, %s\n", leftArg.elem);
-                else if (leftArg.kind == var || leftArg.kind == reg)
-                    fprintf(fout, "MOV\tR1, %s\n", leftArg.elem);
-            
                 char* asmCommand = getAsmCommand(n->elem);
-                fprintf(fout, "%s\tR1, %s\n", asmCommand, rightArg.elem);
+                fprintf(fout, "%s\t\tR1, %s\n", asmCommand, rightArg.elem);
 
-                ++regNumResult;
-                fprintf(fout, "MOV R%d, R1\n", regNumResult);
+                regNumResult = regAllocatorAlloc(
+                    &regAllocator);
+
+                fprintf(fout, "MOV\t\tR%d, R1\n", regNumResult);
                 
                 sprintf(r, "R%d", regNumResult);
-                stack_pushBack(&tmp, r, reg);
+                stackPushBack(&tmp, r, reg);
 
             }
         }
@@ -185,7 +200,12 @@ void stack_run(const struct SolverStack* stack, FILE* fout) {
     }
 
     if (!wasAssigment) {
-        fprintf(fout, "MOV\tR1, R%d\n", regNumResult);
+        if (regNumResult != 1)
+            fprintf(fout, "MOV\t\tR1, R%d\n", regNumResult);
+        else if (tmp.end->kind == num)
+            fprintf(fout, "LDI\t\tR1, %s\n", tmp.end->elem);
+        else if (tmp.end->kind == var)    
+            fprintf(fout, "MOV\t\tR1, %s\n", tmp.end->elem);
     }
     
 }

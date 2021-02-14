@@ -7,19 +7,30 @@
 void yyerror(char *s) ;
 int yylex();        // ???? 
 
+extern char* yytext;
+
 extern FILE* yyin;
 FILE* fout;
 
 char lastVarName[128];
 char lastNumber[128];
+char lastBinOperator[5];
 
-char lastBinOperator[5] = "";
+enum NodeKind lastExprKind;
 
 int numError = 0;
 
 struct SolverStack stack;
 struct SolverStack tmp;
-enum NodeKind lastExprKind;
+
+void tmpStackPrint() {
+    fprintf(fout, "[stack: ");
+    for (struct Node* i = stack.begin; i != NULL; i = i->next) {
+        fprintf(fout, "%s ", i->elem);
+    }
+    fprintf(fout, "]\n");
+
+}
 
 %} 
 
@@ -49,13 +60,15 @@ semicolon:
     SEMICOLON {
 
         struct Node n;
-        while (!stack_isEmpty(&tmp)) {
-            n = stack_popBack(&tmp);
-            stack_pushBack(&stack, n.elem, n.kind);
+        while (!stackIsEmpty(&tmp)) {
+            n = stackPopBack(&tmp);
+            stackPushBack(&stack, n.elem, n.kind);
         }
 
-        stack_run(&stack, fout);
-        stack_clear(&stack);
+        // tmpStackPrint();
+
+        stackRun(&stack, fout);
+        stackClear(&stack);
     };
 
 command:
@@ -63,7 +76,7 @@ command:
         fprintf(fout, "CALL\tprint\n");
     } |
     RETURN expr semicolon {
-        fprintf(fout, "RET\tR1\n");
+        fprintf(fout, "RET\t\tR1\n");
     } |
     
     expr semicolon |
@@ -94,37 +107,38 @@ cycle_while:
 var_or_number:
     VAR {
         lastExprKind = var;
-        stack_pushBack(&stack, lastVarName, var);
+        stackPushBack(&stack, lastVarName, var);
     } | 
     NUMBER {
         lastExprKind = num;
-        stack_pushBack(&stack, lastNumber, num);
+        stackPushBack(&stack, lastNumber, num);
     };
 
 expr:
     var_or_number |
     OPEN {
-        stack_pushBack(&tmp, "(", open_parenthesis);
+        stackPushBack(&tmp, "(", open_parenthesis);
     }
     expr 
     CLOSE {
         struct Node n;
         
         while (true) {
-            n = stack_popBack(&tmp);
+            n = stackPopBack(&tmp);
             if (n.kind == open_parenthesis) {
                 break;
             }
-            stack_pushBack(&stack, n.elem, n.kind);
+            stackPushBack(&stack, n.elem, n.kind);
         }
 
     } |
     
     expr 
     binary_operator {
-        
-        struct Node e;
-        while (!stack_isEmpty(&tmp)) {
+        strcpy(lastBinOperator, yytext);
+
+        struct Node n;
+        while (!stackIsEmpty(&tmp)) {
             bool compare;
             if (!strcmp("=", lastBinOperator)) {
                 compare = (
@@ -141,11 +155,11 @@ expr:
                 break;
             }
 
-            e = stack_popBack(&tmp);
-            stack_pushBack(&stack, e.elem, e.kind);
+            n = stackPopBack(&tmp);
+            stackPushBack(&stack, n.elem, n.kind);
         }
 
-        stack_pushBack(&tmp, lastBinOperator, operator);
+        stackPushBack(&tmp, lastBinOperator, operator);
     }
     expr |
     
@@ -165,33 +179,13 @@ binary_operator:
         strcpy(lastBinOperator, "="); 
     } | 
     
-    IS_EQUAL { strcpy(lastBinOperator, "=="); } |     
-    IS_NOT_EQUAL { strcpy(lastBinOperator, "!="); } |     
-    IS_MORE { strcpy(lastBinOperator, ">"); } |     
-    IS_LESS { strcpy(lastBinOperator, "<"); } |     
-    IS_MEQUAL { strcpy(lastBinOperator, ">="); } |     
-    IS_LEQUAL { strcpy(lastBinOperator, "<="); } |     
-    
-    ADD { strcpy(lastBinOperator, "+"); } | 
-    SUB { strcpy(lastBinOperator, "-"); }| 
-    MUL { strcpy(lastBinOperator, "*"); }| 
-    DIV { strcpy(lastBinOperator, "/"); }| 
-    
-    AASS { strcpy(lastBinOperator, "+="); } |      
-    SASS { strcpy(lastBinOperator, "-="); } |      
-    MASS { strcpy(lastBinOperator, "*="); } |      
-    DASS { strcpy(lastBinOperator, "/="); } |      
-    
-    AND { strcpy(lastBinOperator, "&&"); } | 
-    OR { strcpy(lastBinOperator, "||"); } | 
-    
-    BIT_AND { strcpy(lastBinOperator, "&"); } | 
-    BIT_OR { strcpy(lastBinOperator, "|"); } | 
-    BIT_XOR { strcpy(lastBinOperator, "^"); } | 
-    BIT_RIGHT_SHIFT { strcpy(lastBinOperator, ">>"); } | 
-    BIT_LEFT_SHIFT { strcpy(lastBinOperator, "<<"); } |
-    
-    MOD { strcpy(lastBinOperator, "%"); };
+    IS_EQUAL | IS_NOT_EQUAL | 
+    IS_MORE | IS_LESS | IS_MEQUAL | IS_LEQUAL |     
+    ADD | SUB | MUL | DIV |   
+    AASS | SASS | MASS | DASS |      
+    AND | OR | MOD |
+    BIT_AND | BIT_OR | BIT_XOR | 
+    BIT_RIGHT_SHIFT | BIT_LEFT_SHIFT;
 %% 
 
 void yyerror(char *s) 
@@ -229,11 +223,10 @@ int main(int argc, void *argv[])
 	    return -1;
     }
     
-    stack_init(&stack);
-    stack_init(&tmp);
+    stackInit(&stack);
+    stackInit(&tmp);
 
     yyparse();
-
 
     fclose(yyin);
     fclose(fout);

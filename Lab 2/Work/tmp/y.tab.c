@@ -77,22 +77,33 @@
 void yyerror(char *s) ;
 int yylex();        // ???? 
 
+extern char* yytext;
+
 extern FILE* yyin;
 FILE* fout;
 
 char lastVarName[128];
 char lastNumber[128];
+char lastBinOperator[5];
 
-char lastBinOperator[5] = "";
+enum NodeKind lastExprKind;
 
 int numError = 0;
 
 struct SolverStack stack;
 struct SolverStack tmp;
-enum NodeKind lastExprKind;
+
+void tmpStackPrint() {
+    fprintf(fout, "[stack: ");
+    for (struct Node* i = stack.begin; i != NULL; i = i->next) {
+        fprintf(fout, "%s ", i->elem);
+    }
+    fprintf(fout, "]\n");
+
+}
 
 
-#line 96 "y.tab.c"
+#line 107 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -663,12 +674,12 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    43,    43,    45,    48,    49,    62,    65,    69,    71,
-      72,    75,    78,    82,    84,    87,    91,    95,    99,   105,
-     106,   106,   124,   123,   152,   155,   155,   156,   156,   157,
-     157,   160,   168,   169,   170,   171,   172,   173,   175,   176,
-     177,   178,   180,   181,   182,   183,   185,   186,   188,   189,
-     190,   191,   192,   194
+       0,    54,    54,    56,    59,    60,    75,    78,    82,    84,
+      85,    88,    91,    95,    97,   100,   104,   108,   112,   118,
+     119,   119,   137,   136,   166,   169,   169,   170,   170,   171,
+     171,   174,   182,   182,   183,   183,   183,   183,   184,   184,
+     184,   184,   185,   185,   185,   185,   186,   186,   186,   187,
+     187,   187,   188,   188
 };
 #endif
 
@@ -748,8 +759,8 @@ static const yytype_int8 yydefact[] =
        2,     0,     1,    20,    18,    17,     0,     0,     0,     0,
        0,     0,     0,     0,     3,     9,    10,    19,     0,    24,
        0,     0,     0,     0,     0,    29,    30,    27,    25,     5,
-      38,    39,    40,    41,    46,    47,    48,    49,    50,    52,
-      51,    53,    28,    26,    31,    32,    33,    35,    34,    37,
+      38,    39,    40,    41,    46,    47,    49,    50,    51,    53,
+      52,    48,    28,    26,    31,    32,    33,    35,    34,    37,
       36,    42,    43,    44,    45,     8,    22,     0,     0,     0,
        6,     7,     4,     0,    21,     0,     0,    23,     2,    13,
       16,     0,     0,     0,    12,    11,     0,    15,     0,     0,
@@ -1341,86 +1352,89 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* semicolon: SEMICOLON  */
-#line 49 "src/grammar.y"
+#line 60 "src/grammar.y"
               {
 
         struct Node n;
-        while (!stack_isEmpty(&tmp)) {
-            n = stack_popBack(&tmp);
-            stack_pushBack(&stack, n.elem, n.kind);
+        while (!stackIsEmpty(&tmp)) {
+            n = stackPopBack(&tmp);
+            stackPushBack(&stack, n.elem, n.kind);
         }
 
-        stack_run(&stack, fout);
-        stack_clear(&stack);
+        // tmpStackPrint();
+
+        stackRun(&stack, fout);
+        stackClear(&stack);
     }
-#line 1357 "y.tab.c"
+#line 1370 "y.tab.c"
     break;
 
   case 6: /* command: PRINT expr semicolon  */
-#line 62 "src/grammar.y"
+#line 75 "src/grammar.y"
                          {
         fprintf(fout, "CALL\tprint\n");
     }
-#line 1365 "y.tab.c"
+#line 1378 "y.tab.c"
     break;
 
   case 7: /* command: RETURN expr semicolon  */
-#line 65 "src/grammar.y"
+#line 78 "src/grammar.y"
                           {
-        fprintf(fout, "RET\tR1\n");
+        fprintf(fout, "RET\t\tR1\n");
     }
-#line 1373 "y.tab.c"
+#line 1386 "y.tab.c"
     break;
 
   case 17: /* var_or_number: VAR  */
-#line 95 "src/grammar.y"
+#line 108 "src/grammar.y"
         {
         lastExprKind = var;
-        stack_pushBack(&stack, lastVarName, var);
+        stackPushBack(&stack, lastVarName, var);
     }
-#line 1382 "y.tab.c"
+#line 1395 "y.tab.c"
     break;
 
   case 18: /* var_or_number: NUMBER  */
-#line 99 "src/grammar.y"
+#line 112 "src/grammar.y"
            {
         lastExprKind = num;
-        stack_pushBack(&stack, lastNumber, num);
+        stackPushBack(&stack, lastNumber, num);
     }
-#line 1391 "y.tab.c"
+#line 1404 "y.tab.c"
     break;
 
   case 20: /* $@1: %empty  */
-#line 106 "src/grammar.y"
+#line 119 "src/grammar.y"
          {
-        stack_pushBack(&tmp, "(", open_parenthesis);
+        stackPushBack(&tmp, "(", open_parenthesis);
     }
-#line 1399 "y.tab.c"
+#line 1412 "y.tab.c"
     break;
 
   case 21: /* expr: OPEN $@1 expr CLOSE  */
-#line 110 "src/grammar.y"
+#line 123 "src/grammar.y"
           {
         struct Node n;
         
         while (true) {
-            n = stack_popBack(&tmp);
+            n = stackPopBack(&tmp);
             if (n.kind == open_parenthesis) {
                 break;
             }
-            stack_pushBack(&stack, n.elem, n.kind);
+            stackPushBack(&stack, n.elem, n.kind);
         }
 
     }
-#line 1416 "y.tab.c"
+#line 1429 "y.tab.c"
     break;
 
   case 22: /* $@2: %empty  */
-#line 124 "src/grammar.y"
+#line 137 "src/grammar.y"
                     {
-        
-        struct Node e;
-        while (!stack_isEmpty(&tmp)) {
+        strcpy(lastBinOperator, yytext);
+
+        struct Node n;
+        while (!stackIsEmpty(&tmp)) {
             bool compare;
             if (!strcmp("=", lastBinOperator)) {
                 compare = (
@@ -1437,17 +1451,17 @@ yyreduce:
                 break;
             }
 
-            e = stack_popBack(&tmp);
-            stack_pushBack(&stack, e.elem, e.kind);
+            n = stackPopBack(&tmp);
+            stackPushBack(&stack, n.elem, n.kind);
         }
 
-        stack_pushBack(&tmp, lastBinOperator, operator);
+        stackPushBack(&tmp, lastBinOperator, operator);
     }
-#line 1447 "y.tab.c"
+#line 1461 "y.tab.c"
     break;
 
   case 31: /* binary_operator: ASSIGN  */
-#line 160 "src/grammar.y"
+#line 174 "src/grammar.y"
            { 
         if (lastExprKind == num) {
             yyerror("syntax error");
@@ -1455,143 +1469,11 @@ yyreduce:
         }
         strcpy(lastBinOperator, "="); 
     }
-#line 1459 "y.tab.c"
+#line 1473 "y.tab.c"
     break;
 
-  case 32: /* binary_operator: IS_EQUAL  */
-#line 168 "src/grammar.y"
-             { strcpy(lastBinOperator, "=="); }
-#line 1465 "y.tab.c"
-    break;
 
-  case 33: /* binary_operator: IS_NOT_EQUAL  */
-#line 169 "src/grammar.y"
-                 { strcpy(lastBinOperator, "!="); }
-#line 1471 "y.tab.c"
-    break;
-
-  case 34: /* binary_operator: IS_MORE  */
-#line 170 "src/grammar.y"
-            { strcpy(lastBinOperator, ">"); }
 #line 1477 "y.tab.c"
-    break;
-
-  case 35: /* binary_operator: IS_LESS  */
-#line 171 "src/grammar.y"
-            { strcpy(lastBinOperator, "<"); }
-#line 1483 "y.tab.c"
-    break;
-
-  case 36: /* binary_operator: IS_MEQUAL  */
-#line 172 "src/grammar.y"
-              { strcpy(lastBinOperator, ">="); }
-#line 1489 "y.tab.c"
-    break;
-
-  case 37: /* binary_operator: IS_LEQUAL  */
-#line 173 "src/grammar.y"
-              { strcpy(lastBinOperator, "<="); }
-#line 1495 "y.tab.c"
-    break;
-
-  case 38: /* binary_operator: ADD  */
-#line 175 "src/grammar.y"
-        { strcpy(lastBinOperator, "+"); }
-#line 1501 "y.tab.c"
-    break;
-
-  case 39: /* binary_operator: SUB  */
-#line 176 "src/grammar.y"
-        { strcpy(lastBinOperator, "-"); }
-#line 1507 "y.tab.c"
-    break;
-
-  case 40: /* binary_operator: MUL  */
-#line 177 "src/grammar.y"
-        { strcpy(lastBinOperator, "*"); }
-#line 1513 "y.tab.c"
-    break;
-
-  case 41: /* binary_operator: DIV  */
-#line 178 "src/grammar.y"
-        { strcpy(lastBinOperator, "/"); }
-#line 1519 "y.tab.c"
-    break;
-
-  case 42: /* binary_operator: AASS  */
-#line 180 "src/grammar.y"
-         { strcpy(lastBinOperator, "+="); }
-#line 1525 "y.tab.c"
-    break;
-
-  case 43: /* binary_operator: SASS  */
-#line 181 "src/grammar.y"
-         { strcpy(lastBinOperator, "-="); }
-#line 1531 "y.tab.c"
-    break;
-
-  case 44: /* binary_operator: MASS  */
-#line 182 "src/grammar.y"
-         { strcpy(lastBinOperator, "*="); }
-#line 1537 "y.tab.c"
-    break;
-
-  case 45: /* binary_operator: DASS  */
-#line 183 "src/grammar.y"
-         { strcpy(lastBinOperator, "/="); }
-#line 1543 "y.tab.c"
-    break;
-
-  case 46: /* binary_operator: AND  */
-#line 185 "src/grammar.y"
-        { strcpy(lastBinOperator, "&&"); }
-#line 1549 "y.tab.c"
-    break;
-
-  case 47: /* binary_operator: OR  */
-#line 186 "src/grammar.y"
-       { strcpy(lastBinOperator, "||"); }
-#line 1555 "y.tab.c"
-    break;
-
-  case 48: /* binary_operator: BIT_AND  */
-#line 188 "src/grammar.y"
-            { strcpy(lastBinOperator, "&"); }
-#line 1561 "y.tab.c"
-    break;
-
-  case 49: /* binary_operator: BIT_OR  */
-#line 189 "src/grammar.y"
-           { strcpy(lastBinOperator, "|"); }
-#line 1567 "y.tab.c"
-    break;
-
-  case 50: /* binary_operator: BIT_XOR  */
-#line 190 "src/grammar.y"
-            { strcpy(lastBinOperator, "^"); }
-#line 1573 "y.tab.c"
-    break;
-
-  case 51: /* binary_operator: BIT_RIGHT_SHIFT  */
-#line 191 "src/grammar.y"
-                    { strcpy(lastBinOperator, ">>"); }
-#line 1579 "y.tab.c"
-    break;
-
-  case 52: /* binary_operator: BIT_LEFT_SHIFT  */
-#line 192 "src/grammar.y"
-                   { strcpy(lastBinOperator, "<<"); }
-#line 1585 "y.tab.c"
-    break;
-
-  case 53: /* binary_operator: MOD  */
-#line 194 "src/grammar.y"
-        { strcpy(lastBinOperator, "%"); }
-#line 1591 "y.tab.c"
-    break;
-
-
-#line 1595 "y.tab.c"
 
       default: break;
     }
@@ -1785,7 +1667,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 195 "src/grammar.y"
+#line 189 "src/grammar.y"
  
 
 void yyerror(char *s) 
@@ -1823,11 +1705,10 @@ int main(int argc, void *argv[])
 	    return -1;
     }
     
-    stack_init(&stack);
-    stack_init(&tmp);
+    stackInit(&stack);
+    stackInit(&tmp);
 
     yyparse();
-
 
     fclose(yyin);
     fclose(fout);
