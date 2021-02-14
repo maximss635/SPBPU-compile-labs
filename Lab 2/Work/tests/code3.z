@@ -1,0 +1,15 @@
+a = 1;
+b = 4;
+
+while (a < 20) {
+    if (a > 3) {
+        a = a + b;
+    }
+    else {
+        b = a + b;
+    }
+}
+
+R = 7*a - 3*b / (RR + 1);
+
+print b + a;

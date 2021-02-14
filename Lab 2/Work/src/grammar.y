@@ -21,6 +21,7 @@ enum NodeKind lastExprKind;
 
 int condsNum = 0;
 int curElseCasesNum = 0;
+int cyclesNum = 0;
 
 int numError = 0;
 
@@ -43,7 +44,7 @@ void solveExpr() {
         stackPushBack(&stack, n.elem, n.kind);
     }
 
-    //tmpStackPrint();
+    // tmpStackPrint();
 
     stackRun(&stack, fout);
     stackClear(&stack);
@@ -146,7 +147,9 @@ condition:
         fprintf(fout, "\t\tJMP\t\tout_%d\n", condsNum);
     }
     else_case {
-        fprintf(fout, "\ncase_%d_%d:\n", curElseCasesNum + 2, condsNum);
+        fprintf(fout, "\ncase_%d_%d:\n", 
+            curElseCasesNum + 2, condsNum);
+
         fprintf(fout, "out_%d:\n", condsNum);
     };
 
@@ -180,8 +183,22 @@ else_case:
     body;
 
 cycle_while:
-    WHILE OPEN expr CLOSE
-    body;
+    WHILE OPEN expr CLOSE {
+        ++cyclesNum;
+
+        solveExpr();
+
+        char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
+        
+        fprintf(fout, "\t\t%s\t\tcycle_%d_in\n", jmpTypeCmd, cyclesNum);
+        fprintf(fout, "\t\tJMP\t\tcycle_%d_out\n", cyclesNum);
+
+        fprintf(fout, "\ncycle_%d_in:\n", cyclesNum);
+
+    }
+    body {
+        fprintf(fout, "\ncycle_%d_out:\n", cyclesNum);
+    };
 
 var_or_number:
     VAR {
