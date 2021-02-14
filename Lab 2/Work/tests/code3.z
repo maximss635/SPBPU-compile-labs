@@ -1,15 +1,9 @@
-a = 1;
-b = 4;
+a = 0;
 
-while (a < 20) {
-    if (a > 3) {
-        a = a + b;
-    }
-    else {
-        b = a + b;
-    }
+while (a > 0) {
+    ++a;
+    b++;
 }
 
-R = 7*a - 3*b / (RR + 1);
-
-print b + a;
+b = a + 5;
+print b;

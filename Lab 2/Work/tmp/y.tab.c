@@ -94,7 +94,7 @@ void solveExpr() {
         stackPushBack(&stack, n.elem, n.kind);
     }
 
-    tmpStackPrint();
+    // tmpStackPrint();
 
     stackRun(&stack, fout);
     stackClear(&stack);
@@ -144,10 +144,15 @@ void endLineCallBack() {
 
     stackForeachElem(&varsForPostInc, asmInc);
     stackForeachElem(&varsForPostDec, asmDec);
+
+    stackClear(&varsForPredInc);
+    stackClear(&varsForPredDec);
+    stackClear(&varsForPostInc);
+    stackClear(&varsForPostDec);
 }
 
 
-#line 151 "y.tab.c"
+#line 156 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -726,13 +731,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    98,    98,   100,   103,   104,   109,   112,   116,   118,
-     119,   122,   125,   138,   125,   146,   148,   152,   160,   148,
-     164,   164,   172,   172,   191,   195,   201,   202,   203,   203,
-     221,   220,   251,   258,   265,   272,   280,   281,   284,   292,
-     292,   292,   292,   293,   296,   296,   296,   296,   297,   297,
-     297,   298,   298,   298,   299,   299,   302,   302,   303,   303,
-     304,   304
+       0,   103,   103,   105,   108,   109,   114,   117,   121,   123,
+     124,   127,   130,   143,   130,   151,   153,   157,   165,   153,
+     169,   169,   177,   177,   196,   200,   206,   207,   208,   208,
+     226,   225,   256,   263,   270,   277,   285,   286,   289,   297,
+     297,   297,   297,   298,   301,   301,   301,   301,   302,   302,
+     302,   303,   303,   303,   304,   304,   307,   307,   308,   308,
+     309,   309
 };
 #endif
 
@@ -1406,31 +1411,31 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* semicolon: SEMICOLON  */
-#line 104 "src/grammar.y"
+#line 109 "src/grammar.y"
               {
         endLineCallBack();
     }
-#line 1414 "y.tab.c"
+#line 1419 "y.tab.c"
     break;
 
   case 6: /* command: PRINT expr semicolon  */
-#line 109 "src/grammar.y"
+#line 114 "src/grammar.y"
                          {
         fprintf(fout, "\t\tCALL\tprint\n");
     }
-#line 1422 "y.tab.c"
+#line 1427 "y.tab.c"
     break;
 
   case 7: /* command: RETURN expr semicolon  */
-#line 112 "src/grammar.y"
+#line 117 "src/grammar.y"
                           {
         fprintf(fout, "\t\tRET\t\tR1\n");
     }
-#line 1430 "y.tab.c"
+#line 1435 "y.tab.c"
     break;
 
   case 12: /* $@1: %empty  */
-#line 125 "src/grammar.y"
+#line 130 "src/grammar.y"
                        {
         ++condsNum;
 
@@ -1444,37 +1449,37 @@ yyreduce:
         curElseCasesNum = 0;
         fprintf(fout, "\ncase_%d_%d:\n", 1, condsNum);
     }
-#line 1448 "y.tab.c"
+#line 1453 "y.tab.c"
     break;
 
   case 13: /* $@2: %empty  */
-#line 138 "src/grammar.y"
+#line 143 "src/grammar.y"
          {
         fprintf(fout, "\t\tJMP\t\tout_%d\n", condsNum);
     }
-#line 1456 "y.tab.c"
+#line 1461 "y.tab.c"
     break;
 
   case 14: /* condition: IF OPEN expr CLOSE $@1 body $@2 else_case  */
-#line 141 "src/grammar.y"
+#line 146 "src/grammar.y"
               {
         fprintf(fout, "\ncase_%d_%d:\n", curElseCasesNum + 2, condsNum);
         fprintf(fout, "out_%d:\n", condsNum);
     }
-#line 1465 "y.tab.c"
+#line 1470 "y.tab.c"
     break;
 
   case 16: /* $@3: %empty  */
-#line 148 "src/grammar.y"
+#line 153 "src/grammar.y"
                  {
         ++curElseCasesNum;
         fprintf(fout, "\ncase_%d_%d:\n", curElseCasesNum + 1, condsNum);
     }
-#line 1474 "y.tab.c"
+#line 1479 "y.tab.c"
     break;
 
   case 17: /* $@4: %empty  */
-#line 152 "src/grammar.y"
+#line 157 "src/grammar.y"
                {
         solveExpr();
         char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
@@ -1483,29 +1488,29 @@ yyreduce:
         fprintf(fout, "\t\t%s\t\tcase_%d_%d\n", 
             jmpTypeCmd, curElseCasesNum + 2, condsNum);
     }
-#line 1487 "y.tab.c"
+#line 1492 "y.tab.c"
     break;
 
   case 18: /* $@5: %empty  */
-#line 160 "src/grammar.y"
+#line 165 "src/grammar.y"
          {
         fprintf(fout, "\t\tJMP\t\tout_%d\n", condsNum);
     }
-#line 1495 "y.tab.c"
+#line 1500 "y.tab.c"
     break;
 
   case 20: /* $@6: %empty  */
-#line 164 "src/grammar.y"
+#line 169 "src/grammar.y"
          {
         ++curElseCasesNum;
         fprintf(fout, "\ncase_%d_%d:\n",
             curElseCasesNum + 1, condsNum);
     }
-#line 1505 "y.tab.c"
+#line 1510 "y.tab.c"
     break;
 
   case 22: /* $@7: %empty  */
-#line 172 "src/grammar.y"
+#line 177 "src/grammar.y"
                           {
         ++cyclesNum;
 
@@ -1519,46 +1524,46 @@ yyreduce:
         fprintf(fout, "\t\t%s\t\tcycle_%d_out\n", 
             jmpTypeCmd, cyclesNum);
     }
-#line 1523 "y.tab.c"
+#line 1528 "y.tab.c"
     break;
 
   case 23: /* cycle_while: WHILE OPEN expr CLOSE $@7 body  */
-#line 185 "src/grammar.y"
+#line 190 "src/grammar.y"
          {
         fprintf(fout, "\t\tJMP\t\tcycle_%d_in\n", cyclesNum);
         fprintf(fout, "\ncycle_%d_out:\n", cyclesNum);
     }
-#line 1532 "y.tab.c"
+#line 1537 "y.tab.c"
     break;
 
   case 24: /* var_or_number: VAR  */
-#line 191 "src/grammar.y"
+#line 196 "src/grammar.y"
         {
         lastExprKind = var;
         stackPushBack(&stack, lastVarName, var);
     }
-#line 1541 "y.tab.c"
+#line 1546 "y.tab.c"
     break;
 
   case 25: /* var_or_number: NUMBER  */
-#line 195 "src/grammar.y"
+#line 200 "src/grammar.y"
            {
         lastExprKind = num;
         stackPushBack(&stack, lastNumber, num);
     }
-#line 1550 "y.tab.c"
+#line 1555 "y.tab.c"
     break;
 
   case 28: /* $@8: %empty  */
-#line 203 "src/grammar.y"
+#line 208 "src/grammar.y"
          {
         stackPushBack(&tmp, "(", open_parenthesis);
     }
-#line 1558 "y.tab.c"
+#line 1563 "y.tab.c"
     break;
 
   case 29: /* expr: OPEN $@8 expr CLOSE  */
-#line 207 "src/grammar.y"
+#line 212 "src/grammar.y"
           {
         struct Node n;
         
@@ -1571,11 +1576,11 @@ yyreduce:
         }
 
     }
-#line 1575 "y.tab.c"
+#line 1580 "y.tab.c"
     break;
 
   case 30: /* $@9: %empty  */
-#line 221 "src/grammar.y"
+#line 226 "src/grammar.y"
                     {
         strcpy(lastBinOperator, yytext);
 
@@ -1603,11 +1608,11 @@ yyreduce:
 
         stackPushBack(&tmp, lastBinOperator, operator);
     }
-#line 1607 "y.tab.c"
+#line 1612 "y.tab.c"
     break;
 
   case 32: /* unary_operation: INC VAR  */
-#line 251 "src/grammar.y"
+#line 256 "src/grammar.y"
             {
         printf("++%s\n", lastVarName);
         stackPushBack(&varsForPredInc, lastVarName, var);
@@ -1615,11 +1620,11 @@ yyreduce:
         lastExprKind = var;
         stackPushBack(&stack, lastVarName, var);
     }
-#line 1619 "y.tab.c"
+#line 1624 "y.tab.c"
     break;
 
   case 33: /* unary_operation: VAR INC  */
-#line 258 "src/grammar.y"
+#line 263 "src/grammar.y"
             {
         printf("%s++\n", lastVarName);
         stackPushBack(&varsForPostInc, lastVarName, var);
@@ -1627,11 +1632,11 @@ yyreduce:
         lastExprKind = var;
         stackPushBack(&stack, lastVarName, var);
     }
-#line 1631 "y.tab.c"
+#line 1636 "y.tab.c"
     break;
 
   case 34: /* unary_operation: DEC VAR  */
-#line 265 "src/grammar.y"
+#line 270 "src/grammar.y"
             {
         printf("--%s\n", lastVarName);
         stackPushBack(&varsForPredDec, lastVarName, var);
@@ -1639,11 +1644,11 @@ yyreduce:
         lastExprKind = var;
         stackPushBack(&stack, lastVarName, var);
     }
-#line 1643 "y.tab.c"
+#line 1648 "y.tab.c"
     break;
 
   case 35: /* unary_operation: VAR DEC  */
-#line 272 "src/grammar.y"
+#line 277 "src/grammar.y"
             {
         printf("%s--\n", lastVarName);
         stackPushBack(&varsForPostDec, lastVarName, var);
@@ -1651,11 +1656,11 @@ yyreduce:
         lastExprKind = var;
         stackPushBack(&stack, lastVarName, var);
     }
-#line 1655 "y.tab.c"
+#line 1660 "y.tab.c"
     break;
 
   case 38: /* binary_operator: ASSIGN  */
-#line 284 "src/grammar.y"
+#line 289 "src/grammar.y"
            { 
         if (lastExprKind == num) {
             yyerror("syntax error");
@@ -1663,19 +1668,19 @@ yyreduce:
         }
         strcpy(lastBinOperator, "="); 
     }
-#line 1667 "y.tab.c"
+#line 1672 "y.tab.c"
     break;
 
   case 43: /* binary_operator: compare_operator  */
-#line 293 "src/grammar.y"
+#line 298 "src/grammar.y"
                       {
         strcpy(lastBinCompareOperator, yytext);
     }
-#line 1675 "y.tab.c"
+#line 1680 "y.tab.c"
     break;
 
 
-#line 1679 "y.tab.c"
+#line 1684 "y.tab.c"
 
       default: break;
     }
@@ -1869,7 +1874,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 305 "src/grammar.y"
+#line 310 "src/grammar.y"
  
 
 void yyerror(char *s) 

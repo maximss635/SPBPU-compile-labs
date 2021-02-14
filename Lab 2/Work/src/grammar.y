@@ -24,7 +24,7 @@ void solveExpr() {
         stackPushBack(&stack, n.elem, n.kind);
     }
 
-    tmpStackPrint();
+    // tmpStackPrint();
 
     stackRun(&stack, fout);
     stackClear(&stack);
@@ -74,6 +74,11 @@ void endLineCallBack() {
 
     stackForeachElem(&varsForPostInc, asmInc);
     stackForeachElem(&varsForPostDec, asmDec);
+
+    stackClear(&varsForPredInc);
+    stackClear(&varsForPredDec);
+    stackClear(&varsForPostInc);
+    stackClear(&varsForPostDec);
 }
 
 %} 
