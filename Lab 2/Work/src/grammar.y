@@ -19,7 +19,9 @@ char lastBinCompareOperator[4];
 
 enum NodeKind lastExprKind;
 
-int markNum = 0;
+int condsNum = 0;
+int curElseCasesNum = 0;
+
 int numError = 0;
 
 struct SolverStack stack;
@@ -64,6 +66,23 @@ char* getJmpTypeCommand(const char* compareOperator) {
     return "???";
 }
 
+char* getOppositeJmpTypeCommand(const char* jmpType) {
+    if (!strcmp("JE", jmpType)) 
+        return "JNE";
+    if (!strcmp("JNE", jmpType)) 
+        return "JE";
+    if (!strcmp("JG", jmpType)) 
+        return "JLE";
+    if (!strcmp("JL", jmpType)) 
+        return "JGE";
+    if (!strcmp("JLE", jmpType)) 
+        return "JG";
+    if (!strcmp("JGE", jmpType)) 
+        return "JL";
+        
+    return "???";
+}
+
 %} 
 
 %start commands
@@ -95,10 +114,10 @@ semicolon:
 
 command:
     PRINT expr semicolon {
-        fprintf(fout, "\tCALL\tprint\n");
+        fprintf(fout, "\t\tCALL\tprint\n");
     } |
     RETURN expr semicolon {
-        fprintf(fout, "\tRET\t\tR1\n");
+        fprintf(fout, "\t\tRET\t\tR1\n");
     } |
     
     expr semicolon |
@@ -111,40 +130,54 @@ body:
 
 condition:
     IF OPEN expr CLOSE {
+        ++condsNum;
+
         solveExpr();
         
         char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
         
-        fprintf(fout, "\t%s\t\tm%d\n", jmpTypeCmd, markNum + 1);
-        fprintf(fout, "\tJMP\t\t??\n");
+        fprintf(fout, "\t\t%s\t\tcase_1_%d\n", jmpTypeCmd, condsNum);
+        fprintf(fout, "\t\tJMP\t\tcase_2_%d\n", condsNum);
 
-        fprintf(fout, "m%d:\n", ++markNum);
+        curElseCasesNum = 0;
+        fprintf(fout, "\ncase_%d_%d:\n", 1, condsNum);
     }
     body {
-        fprintf(fout, "\tJMP\t\t??????\n");
+        fprintf(fout, "\t\tJMP\t\tout_%d\n", condsNum);
     }
-    else_case;
+    else_case {
+        fprintf(fout, "\ncase_%d_%d:\n", curElseCasesNum + 2, condsNum);
+        fprintf(fout, "out_%d:\n", condsNum);
+    };
 
 else_case:
     /* empty */ {
-        fprintf(fout, "m%d:\n", ++markNum);
+
     } |
     ELSE_IF OPEN {
-        fprintf(fout, "m%d:\n", ++markNum);
+        ++curElseCasesNum;
+
+        fprintf(fout, "\ncase_%d_%d:\n", 
+            curElseCasesNum + 1, condsNum);
     }
     expr CLOSE {
         solveExpr();
         char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
-        fprintf(fout, "\t%s\t\t??\n", jmpTypeCmd);
+        
+        jmpTypeCmd = getOppositeJmpTypeCommand(jmpTypeCmd);
+        fprintf(fout, "\t\t%s\t\tcase_%d_%d\n", 
+            jmpTypeCmd, curElseCasesNum + 2, condsNum);
     } 
-    body 
+    body {
+        fprintf(fout, "\t\tJMP\t\tout_%d\n", condsNum);
+    }
     else_case   |
     ELSE {
-        fprintf(fout, "m%d:\n", ++markNum);
+        ++curElseCasesNum;
+        fprintf(fout, "\ncase_%d_%d:\n",
+            curElseCasesNum + 1, condsNum);
     }
-    body {
-        fprintf(fout, "m%d:\n", ++markNum);
-    };
+    body;
 
 cycle_while:
     WHILE OPEN expr CLOSE
