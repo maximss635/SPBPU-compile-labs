@@ -14,10 +14,12 @@ FILE* fout;
 
 char lastVarName[128];
 char lastNumber[128];
-char lastBinOperator[5];
+char lastBinOperator[4];
+char lastBinCompareOperator[4];
 
 enum NodeKind lastExprKind;
 
+int markNum = 0;
 int numError = 0;
 
 struct SolverStack stack;
@@ -30,6 +32,36 @@ void tmpStackPrint() {
     }
     fprintf(fout, "]\n");
 
+}
+
+void solveExpr() {
+    struct Node n;
+    while (!stackIsEmpty(&tmp)) {
+        n = stackPopBack(&tmp);
+        stackPushBack(&stack, n.elem, n.kind);
+    }
+
+    //tmpStackPrint();
+
+    stackRun(&stack, fout);
+    stackClear(&stack);
+}
+
+char* getJmpTypeCommand(const char* compareOperator) {
+    if (!strcmp("==", compareOperator)) 
+        return "JE";
+    if (!strcmp("!=", compareOperator)) 
+        return "JNE";
+    if (!strcmp(">", compareOperator)) 
+        return "JG";
+    if (!strcmp("<", compareOperator)) 
+        return "JL";
+    if (!strcmp(">=", compareOperator)) 
+        return "JGE";
+    if (!strcmp("<=", compareOperator)) 
+        return "JLE";
+
+    return "???";
 }
 
 %} 
@@ -58,25 +90,15 @@ commands:
 semicolon:
     SEMICOLON semicolon |
     SEMICOLON {
-
-        struct Node n;
-        while (!stackIsEmpty(&tmp)) {
-            n = stackPopBack(&tmp);
-            stackPushBack(&stack, n.elem, n.kind);
-        }
-
-        // tmpStackPrint();
-
-        stackRun(&stack, fout);
-        stackClear(&stack);
+        solveExpr();
     };
 
 command:
     PRINT expr semicolon {
-        fprintf(fout, "CALL\tprint\n");
+        fprintf(fout, "\tCALL\tprint\n");
     } |
     RETURN expr semicolon {
-        fprintf(fout, "RET\t\tR1\n");
+        fprintf(fout, "\tRET\t\tR1\n");
     } |
     
     expr semicolon |
@@ -88,17 +110,41 @@ body:
     OBRACE commands EBRACE;
 
 condition:
-    IF OPEN expr CLOSE
-    body
+    IF OPEN expr CLOSE {
+        solveExpr();
+        
+        char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
+        
+        fprintf(fout, "\t%s\t\tm%d\n", jmpTypeCmd, markNum + 1);
+        fprintf(fout, "\tJMP\t\t??\n");
+
+        fprintf(fout, "m%d:\n", ++markNum);
+    }
+    body {
+        fprintf(fout, "\tJMP\t\t??????\n");
+    }
     else_case;
 
 else_case:
-    /* empty */ |
-    ELSE_IF OPEN expr CLOSE
-    body  
+    /* empty */ {
+        fprintf(fout, "m%d:\n", ++markNum);
+    } |
+    ELSE_IF OPEN {
+        fprintf(fout, "m%d:\n", ++markNum);
+    }
+    expr CLOSE {
+        solveExpr();
+        char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
+        fprintf(fout, "\t%s\t\t??\n", jmpTypeCmd);
+    } 
+    body 
     else_case   |
-    ELSE 
-    body;
+    ELSE {
+        fprintf(fout, "m%d:\n", ++markNum);
+    }
+    body {
+        fprintf(fout, "m%d:\n", ++markNum);
+    };
 
 cycle_while:
     WHILE OPEN expr CLOSE
@@ -178,14 +224,20 @@ binary_operator:
         }
         strcpy(lastBinOperator, "="); 
     } | 
-    
-    IS_EQUAL | IS_NOT_EQUAL | 
-    IS_MORE | IS_LESS | IS_MEQUAL | IS_LEQUAL |     
+        
     ADD | SUB | MUL | DIV |   
+    compare_operator  {
+        strcpy(lastBinCompareOperator, yytext);
+    } |
     AASS | SASS | MASS | DASS |      
     AND | OR | MOD |
     BIT_AND | BIT_OR | BIT_XOR | 
     BIT_RIGHT_SHIFT | BIT_LEFT_SHIFT;
+
+compare_operator:
+    IS_EQUAL | IS_NOT_EQUAL | 
+    IS_MORE | IS_LESS | 
+    IS_MEQUAL | IS_LEQUAL; 
 %% 
 
 void yyerror(char *s) 

@@ -6,7 +6,7 @@ extern char lastVarName[128];
 extern char lastNumber[128];
 %}
 
-%% 
+%%
 \{          return OBRACE;
 \}          return EBRACE;
 \(          return OPEN;

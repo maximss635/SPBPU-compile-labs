@@ -10,10 +10,12 @@
 struct SolverStack {
     struct Node {
         enum NodeKind {
-            operator, num, var,
+            operator, 
+            num, 
+            var,
+            reg,
             open_parenthesis,
-            close_parenthesis,
-            reg
+            close_parenthesis
         } kind;
 
         char elem[128];
@@ -89,6 +91,8 @@ void stackClear(struct SolverStack* stack) {
     }
 }
 
+
+
 int getOperatorPriority(const char* operator) {
    
     static const char priorityTable[11][11][4] = {
@@ -130,6 +134,16 @@ char* getAsmCommand(const char* operator) {
         return "MUL";
     if (!strcmp("/", operator))
         return "DIV";
+
+    if (!strcmp("==", operator) ||
+        !strcmp("!=", operator) ||
+        !strcmp(">", operator)  ||
+        !strcmp(">=", operator) ||
+        !strcmp("<", operator)  ||
+        !strcmp("<=", operator)) {
+        
+        return "CMP"; 
+    }
     
     // to continue
     return "...";
@@ -143,7 +157,7 @@ void stackRun(const struct SolverStack* stack, FILE* fout) {
     struct RegisterAllocator regAllocator;
     regAllocatorInit(&regAllocator);
 
-    int regNumResult = 1;
+    int regNum = 1;
     char r[16];
 
     bool wasAssigment = false;
@@ -159,53 +173,60 @@ void stackRun(const struct SolverStack* stack, FILE* fout) {
         }
 
         if (n->kind == operator) {
-            if (!strcmp("=", n->elem)) {
-                struct Node rightArg = stackPopBack(&tmp);
-                struct Node leftArg = stackPopBack(&tmp);
+            struct Node rightArg = stackPopBack(&tmp);
+            struct Node leftArg = stackPopBack(&tmp);
 
-                fprintf(fout, "MOV\t\t%s, %s\n", 
+            if (!strcmp("=", n->elem)) {
+                fprintf(fout, "\tMOV\t\t%s, %s\n", 
                     leftArg.elem, rightArg.elem);
                 
                 stackPushBack(&tmp, leftArg.elem, leftArg.kind);
 
                 wasAssigment = true;
-            } else {
-                struct Node rightArg = stackPopBack(&tmp);
-                struct Node leftArg = stackPopBack(&tmp);
-
+            } 
+            else {
                 if (leftArg.kind == num) {
-                    fprintf(fout, "LDI\t\tR1, %s\n", leftArg.elem);
+                    fprintf(fout, "\tLDI\t\tR1, %s\n", leftArg.elem);
                 }
                 else if (leftArg.kind == var || leftArg.kind == reg) {
-                    fprintf(fout, "MOV\t\tR1, %s\n", leftArg.elem);
+                    fprintf(fout, "\tMOV\t\tR1, %s\n", leftArg.elem);
                     
                     regAllocatorFree(
                         &regAllocator, (int)(leftArg.elem[1] - '0'));
                 }
 
+                if (rightArg.kind == reg)
+                    regAllocatorFree(
+                        &regAllocator, (int)(rightArg.elem[1] - '0'));
+
                 char* asmCommand = getAsmCommand(n->elem);
-                fprintf(fout, "%s\t\tR1, %s\n", asmCommand, rightArg.elem);
+                fprintf(fout, "\t%s\t\tR1, %s\n", 
+                    asmCommand, rightArg.elem);
 
-                regNumResult = regAllocatorAlloc(
-                    &regAllocator);
+                if (!stackIsEmpty(&tmp)) {
+                    // save result to Rx
 
-                fprintf(fout, "MOV\t\tR%d, R1\n", regNumResult);
+                    regNum = regAllocatorAlloc(&regAllocator);               
+                    if (-1 == regNum)
+                        fprintf(fout, "!!! ERROR: ALL REGISTERS ARE BUSY !!!\n");
+
+                    fprintf(fout, "\tMOV\t\tR%d, R1\n", regNum);
                 
-                sprintf(r, "R%d", regNumResult);
-                stackPushBack(&tmp, r, reg);
-
+                    sprintf(r, "R%d", regNum);
+                    stackPushBack(&tmp, r, reg);
+                }
             }
         }
 
     }
 
-    if (!wasAssigment) {
-        if (regNumResult != 1)
-            fprintf(fout, "MOV\t\tR1, R%d\n", regNumResult);
+    if (!wasAssigment && !stackIsEmpty(&tmp)) {
+        if (regNum != 1)
+            fprintf(fout, "\tMOV\t\tR1, R%d\n", regNum);
         else if (tmp.end->kind == num)
-            fprintf(fout, "LDI\t\tR1, %s\n", tmp.end->elem);
+            fprintf(fout, "\tLDI\t\tR1, %s\n", tmp.end->elem);
         else if (tmp.end->kind == var)    
-            fprintf(fout, "MOV\t\tR1, %s\n", tmp.end->elem);
+            fprintf(fout, "\tMOV\t\tR1, %s\n", tmp.end->elem);
     }
     
 }

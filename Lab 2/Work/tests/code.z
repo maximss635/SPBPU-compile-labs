@@ -1,5 +1,5 @@
 res1 = res2 = res3 = 5 * a + 8 * y / r - 32;
 
-print b + 3;
+print 1 + b + 3;
 
 return a;
