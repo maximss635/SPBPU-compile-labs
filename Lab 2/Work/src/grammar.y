@@ -3,30 +3,10 @@
 #include <string.h>
 
 #include "SolverStack.h"
+#include "Vars.h"
 
 void yyerror(char *s) ;
 int yylex();        // ???? 
-
-extern char* yytext;
-
-extern FILE* yyin;
-FILE* fout;
-
-char lastVarName[128];
-char lastNumber[128];
-char lastBinOperator[4];
-char lastBinCompareOperator[4];
-
-enum NodeKind lastExprKind;
-
-int condsNum = 0;
-int curElseCasesNum = 0;
-int cyclesNum = 0;
-
-int numError = 0;
-
-struct SolverStack stack;
-struct SolverStack tmp;
 
 void tmpStackPrint() {
     fprintf(fout, "[stack: ");
@@ -44,7 +24,7 @@ void solveExpr() {
         stackPushBack(&stack, n.elem, n.kind);
     }
 
-    // tmpStackPrint();
+    tmpStackPrint();
 
     stackRun(&stack, fout);
     stackClear(&stack);
@@ -84,6 +64,18 @@ char* getOppositeJmpTypeCommand(const char* jmpType) {
     return "???";
 }
 
+
+
+void endLineCallBack() {
+    stackForeachElem(&varsForPredInc, asmInc);
+    stackForeachElem(&varsForPredDec, asmDec);
+
+    solveExpr();
+
+    stackForeachElem(&varsForPostInc, asmInc);
+    stackForeachElem(&varsForPostDec, asmDec);
+}
+
 %} 
 
 %start commands
@@ -94,9 +86,9 @@ char* getOppositeJmpTypeCommand(const char* jmpType) {
 %token IF ELSE_IF ELSE WHILE 
 %token PRINT RETURN 
 %token ADD SUB MUL DIV AND OR 
+%token DEC INC
 %token BIT_AND BIT_OR BIT_XOR 
 %token BIT_LEFT_SHIFT BIT_RIGHT_SHIFT MOD
-%token DEC INC
 %token ASSIGN 
 %token IS_EQUAL IS_NOT_EQUAL 
 %token IS_LESS IS_MORE IS_LEQUAL IS_MEQUAL
@@ -110,7 +102,7 @@ commands:
 semicolon:
     SEMICOLON semicolon |
     SEMICOLON {
-        solveExpr();
+        endLineCallBack();
     };
 
 command:
@@ -142,26 +134,20 @@ condition:
 
         curElseCasesNum = 0;
         fprintf(fout, "\ncase_%d_%d:\n", 1, condsNum);
-    }
+    } 
     body {
         fprintf(fout, "\t\tJMP\t\tout_%d\n", condsNum);
-    }
+    } 
     else_case {
-        fprintf(fout, "\ncase_%d_%d:\n", 
-            curElseCasesNum + 2, condsNum);
-
+        fprintf(fout, "\ncase_%d_%d:\n", curElseCasesNum + 2, condsNum);
         fprintf(fout, "out_%d:\n", condsNum);
     };
 
 else_case:
-    /* empty */ {
-
-    } |
+    /* empty */ |
     ELSE_IF OPEN {
         ++curElseCasesNum;
-
-        fprintf(fout, "\ncase_%d_%d:\n", 
-            curElseCasesNum + 1, condsNum);
+        fprintf(fout, "\ncase_%d_%d:\n", curElseCasesNum + 1, condsNum);
     }
     expr CLOSE {
         solveExpr();
@@ -186,17 +172,18 @@ cycle_while:
     WHILE OPEN expr CLOSE {
         ++cyclesNum;
 
+        fprintf(fout, "\ncycle_%d_in:\n", cyclesNum);
+
         solveExpr();
 
         char* jmpTypeCmd = getJmpTypeCommand(lastBinCompareOperator);
-        
-        fprintf(fout, "\t\t%s\t\tcycle_%d_in\n", jmpTypeCmd, cyclesNum);
-        fprintf(fout, "\t\tJMP\t\tcycle_%d_out\n", cyclesNum);
+        jmpTypeCmd = getOppositeJmpTypeCommand(jmpTypeCmd);
 
-        fprintf(fout, "\ncycle_%d_in:\n", cyclesNum);
-
+        fprintf(fout, "\t\t%s\t\tcycle_%d_out\n", 
+            jmpTypeCmd, cyclesNum);
     }
     body {
+        fprintf(fout, "\t\tJMP\t\tcycle_%d_in\n", cyclesNum);
         fprintf(fout, "\ncycle_%d_out:\n", cyclesNum);
     };
 
@@ -212,6 +199,7 @@ var_or_number:
 
 expr:
     var_or_number |
+    unary_operation |
     OPEN {
         stackPushBack(&tmp, "(", open_parenthesis);
     }
@@ -257,14 +245,40 @@ expr:
 
         stackPushBack(&tmp, lastBinOperator, operator);
     }
-    expr |
-    
-    unary_operation;
+    expr;
 
 unary_operation:
-    INC expr | expr INC |
-    DEC expr | expr DEC |
-    ADD expr | SUB expr;
+    INC VAR {
+        printf("++%s\n", lastVarName);
+        stackPushBack(&varsForPredInc, lastVarName, var);
+
+        lastExprKind = var;
+        stackPushBack(&stack, lastVarName, var);
+    } | 
+    VAR INC {
+        printf("%s++\n", lastVarName);
+        stackPushBack(&varsForPostInc, lastVarName, var);
+
+        lastExprKind = var;
+        stackPushBack(&stack, lastVarName, var);
+    } |
+    DEC VAR {
+        printf("--%s\n", lastVarName);
+        stackPushBack(&varsForPredDec, lastVarName, var);
+
+        lastExprKind = var;
+        stackPushBack(&stack, lastVarName, var);
+    } | 
+    VAR DEC {
+        printf("%s--\n", lastVarName);
+        stackPushBack(&varsForPostDec, lastVarName, var);
+
+        lastExprKind = var;
+        stackPushBack(&stack, lastVarName, var);
+    } |
+
+    ADD expr | 
+    SUB expr;
 
 binary_operator:
     ASSIGN { 
@@ -327,6 +341,11 @@ int main(int argc, void *argv[])
     
     stackInit(&stack);
     stackInit(&tmp);
+
+    stackInit(&varsForPostInc);
+    stackInit(&varsForPostDec);
+    stackInit(&varsForPredInc);
+    stackInit(&varsForPredDec);
 
     yyparse();
 

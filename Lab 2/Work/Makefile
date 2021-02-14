@@ -8,5 +8,6 @@ all:
 
 	cp src/SolverStack.h tmp/
 	cp src/RegisterAllocator.h tmp/
+	cp src/Vars.h tmp/
 
 	cc tmp/lex.yy.c tmp/y.tab.c -o compile -lfl

@@ -23,7 +23,6 @@ void regAllocatorInit(struct RegisterAllocator* registerAllocator) {
 }
 
 int regAllocatorAlloc(struct RegisterAllocator* registerAllocator) {
-    
     for (uint i = 0; i < 32; ++i) {   
         if (GET_BIT(registerAllocator->busyMask, i)) {
             continue;

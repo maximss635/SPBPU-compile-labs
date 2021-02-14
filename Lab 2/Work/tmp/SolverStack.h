@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "RegisterAllocator.h"
+#include "Vars.h"
 
 struct SolverStack {
     struct Node {
@@ -15,7 +16,8 @@ struct SolverStack {
             var,
             reg,
             open_parenthesis,
-            close_parenthesis
+            close_parenthesis,
+            unary_minus
         } kind;
 
         char elem[128];
@@ -50,7 +52,7 @@ void stackPushBack(struct SolverStack* stack, const char* newElem,
         stack->end->next = newNode;
         newNode->prev = stack->end;
         stack->end = newNode;
-    } else {
+    } else {    
         stack->end = stack->begin = newNode;
         newNode->prev = NULL;
     }
@@ -91,11 +93,31 @@ void stackClear(struct SolverStack* stack) {
     }
 }
 
+void asmInc(char* var) { 
+    fprintf(fout, "\t\tMOV\t\tR1, %s\n", (var));  
+    fprintf(fout, "\t\tINC\t\tR1\n");             
+    fprintf(fout, "\t\tMOV\t\t%s, R1\n", (var));
+}
+
+void asmDec(char* var) { 
+    fprintf(fout, "\t\tMOV\t\tR1, %s\n", (var));  
+    fprintf(fout, "\t\tDEC\t\tR1\n");             
+    fprintf(fout, "\t\tMOV\t\t%s, R1\n", (var));
+}
+
+void stackForeachElem(const struct SolverStack* stack, void(*func)(char*)) {
+    for (struct Node* n = stack->begin;
+        n != NULL; n = n->next) {
+        func(n->elem);
+    }
+}
+
 
 
 int getOperatorPriority(const char* operator) {
    
-    static const char priorityTable[11][11][4] = {
+    static const char priorityTable[12][12][4] = {
+        {"++", "--"},   // prefix
         {"*", "/", "%"},
         {"+", "-"},
         {">>", "<<"},
@@ -114,10 +136,10 @@ int getOperatorPriority(const char* operator) {
         },
     };
 
-    for (int i = 0; i < 11; ++i) {
-        for (int j = 0; j < 11; ++j) {
+    for (int i = 0; i < 12; ++i) {
+        for (int j = 0; j < 12; ++j) {
             if (!strcmp(priorityTable[i][j], operator)) {
-                return 11 - i;
+                return 12 - i;
             }
         }
     }
@@ -169,10 +191,9 @@ void stackRun(const struct SolverStack* stack, FILE* fout) {
 
         if (n->kind == num || n->kind == var) {
             stackPushBack(&tmp, n->elem, n->kind);
-            continue;
         }
 
-        if (n->kind == operator) {
+        else if (n->kind == operator) {
             struct Node rightArg = stackPopBack(&tmp);
             struct Node leftArg = stackPopBack(&tmp);
 
@@ -191,8 +212,9 @@ void stackRun(const struct SolverStack* stack, FILE* fout) {
                 else if (leftArg.kind == var || leftArg.kind == reg) {
                     fprintf(fout, "\t\tMOV\t\tR1, %s\n", leftArg.elem);
                     
-                    regAllocatorFree(
-                        &regAllocator, (int)(leftArg.elem[1] - '0'));
+                    if (leftArg.kind == reg)
+                        regAllocatorFree(
+                            &regAllocator, (int)(leftArg.elem[1] - '0'));
                 }
 
                 if (rightArg.kind == reg)
@@ -216,6 +238,7 @@ void stackRun(const struct SolverStack* stack, FILE* fout) {
                     stackPushBack(&tmp, r, reg);
                 }
             }
+
         }
 
     }

@@ -73,14 +73,14 @@ extern int yydebug;
     DIV = 274,                     /* DIV  */
     AND = 275,                     /* AND  */
     OR = 276,                      /* OR  */
-    BIT_AND = 277,                 /* BIT_AND  */
-    BIT_OR = 278,                  /* BIT_OR  */
-    BIT_XOR = 279,                 /* BIT_XOR  */
-    BIT_LEFT_SHIFT = 280,          /* BIT_LEFT_SHIFT  */
-    BIT_RIGHT_SHIFT = 281,         /* BIT_RIGHT_SHIFT  */
-    MOD = 282,                     /* MOD  */
-    DEC = 283,                     /* DEC  */
-    INC = 284,                     /* INC  */
+    DEC = 277,                     /* DEC  */
+    INC = 278,                     /* INC  */
+    BIT_AND = 279,                 /* BIT_AND  */
+    BIT_OR = 280,                  /* BIT_OR  */
+    BIT_XOR = 281,                 /* BIT_XOR  */
+    BIT_LEFT_SHIFT = 282,          /* BIT_LEFT_SHIFT  */
+    BIT_RIGHT_SHIFT = 283,         /* BIT_RIGHT_SHIFT  */
+    MOD = 284,                     /* MOD  */
     ASSIGN = 285,                  /* ASSIGN  */
     IS_EQUAL = 286,                /* IS_EQUAL  */
     IS_NOT_EQUAL = 287,            /* IS_NOT_EQUAL  */
@@ -118,14 +118,14 @@ extern int yydebug;
 #define DIV 274
 #define AND 275
 #define OR 276
-#define BIT_AND 277
-#define BIT_OR 278
-#define BIT_XOR 279
-#define BIT_LEFT_SHIFT 280
-#define BIT_RIGHT_SHIFT 281
-#define MOD 282
-#define DEC 283
-#define INC 284
+#define DEC 277
+#define INC 278
+#define BIT_AND 279
+#define BIT_OR 280
+#define BIT_XOR 281
+#define BIT_LEFT_SHIFT 282
+#define BIT_RIGHT_SHIFT 283
+#define MOD 284
 #define ASSIGN 285
 #define IS_EQUAL 286
 #define IS_NOT_EQUAL 287
