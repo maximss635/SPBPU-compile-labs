@@ -166,7 +166,25 @@ char* getAsmCommand(const char* operator) {
         
         return "CMP"; 
     }
-    
+
+    if (!strcmp("<<", operator))
+        return "LS";
+    if (!strcmp(">>", operator))
+        return "RS";
+
+    if (!strcmp("&", operator))
+        return "AND";
+    if (!strcmp("&&", operator))
+        return "AND";
+    if (!strcmp("|", operator))
+        return "OR";
+    if (!strcmp("||", operator))
+        return "OR";
+    if (!strcmp("^", operator))
+        return "XOR";
+    if (!strcmp("%", operator))
+        return "MOD";
+
     // to continue
     return "...";
 }   

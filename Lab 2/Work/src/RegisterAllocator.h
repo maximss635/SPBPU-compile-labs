@@ -37,6 +37,7 @@ int regAllocatorAlloc(struct RegisterAllocator* registerAllocator) {
 
 int regAllocatorFree(struct RegisterAllocator* registerAllocator,
     const int registerNum) {
+        
     RESET_BIT(registerAllocator->busyMask, registerNum - 1);
 }
 
