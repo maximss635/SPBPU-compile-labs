@@ -1,0 +1,14 @@
+//
+// Created by maxim on 17.02.2021.
+//
+
+#ifndef VIRTUAL_MACHINE_ASMCOMMANDHANDLER_H
+#define VIRTUAL_MACHINE_ASMCOMMANDHANDLER_H
+
+
+class AsmCommandHandler {
+
+};
+
+
+#endif //VIRTUAL_MACHINE_ASMCOMMANDHANDLER_H
