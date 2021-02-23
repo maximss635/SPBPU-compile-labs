@@ -88,62 +88,6 @@ void CommandList::runCommand(Command& command) {
         setRegister(regNum, newValue);
     }
 
-    else if (command.instruction == "AND") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = oldValue & getValue(command.argRight);
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "OR") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = oldValue | getValue(command.argRight);
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "XOR") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = oldValue ^ getValue(command.argRight);
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "LS") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = oldValue << getValue(command.argRight);
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "RS") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = oldValue >> getValue(command.argRight);
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "MOD") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = oldValue % getValue(command.argRight);
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "INC") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = ++oldValue;
-        setRegister(regNum, newValue);
-    }
-
-    else if (command.instruction == "DEC") {
-        int regNum = command.argLeft.midRef(1).toInt();
-        int oldValue = getRegister(regNum);
-        int newValue = --oldValue;
-        setRegister(regNum, newValue);
-    }
-
     else if (command.instruction == "RET") {
         int exitCode = getValue(command.argLeft);
         printf("[VM] Programm exit with code %d\n", exitCode);
