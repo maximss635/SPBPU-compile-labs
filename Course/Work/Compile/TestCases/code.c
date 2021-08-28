@@ -1,21 +1,41 @@
-int foo ( int a )
+int instancesDeclarations( int a );
+void conditions( int a, int b, int c, int d, int e, int g );
+void longExpr();
+
+int instancesDeclarations( int a )
 {
     static char A = 1, B = 2, C = 3, D = 4 ;
+    double n = 1.0, y, gdsfg, fgsdfg, dsfgsdfg, dfgsdsfg_, fg = 45.4f , dddddd;
+    int a, b = A + B << C / D + 123 - 32482374 , c;
+    const char t = A + B + C + dddddd;
 
-    int a, b, c;
 
     return a;
 }
 
-int bar( int t )
-{
-    int a, b, c, d = 1, e, f, g = 5, h, i, j, k, l;
-    int u = t + 1 - 23 & 1 && 2 | 2 || a << b >> c < k;
+inline int foo( int t ) { return ++t; }
 
-    return u;
+void longExpr()
+{
+    int a, b, c, d;
+    a = a + b / c << ( d % a ) + ( ++d ) + ( c-- ) / ( 8 & 3 | a ) + (1-2) / 11 + a;
+    return a + b * c << d / (a + 11 + 2 + (b+c));
 }
 
-void foo_bar_1( int a, double b, unsigned char c )
+void conditions( int a, int b, int c, int d, int e, int g )
 {
-    bar( a );
+    if ( a > b)
+    {
+        foo( a );
+    }
+    else if ( b > c )
+    {
+        foo( b);
+    }
+    else ( a )
+        foo( foo( a ) + foo( b ) );
+    if ( a )
+        if ( b )
+            if ( c )
+                foo ( c );
 }

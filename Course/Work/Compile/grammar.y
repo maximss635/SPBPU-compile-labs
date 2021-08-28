@@ -16,13 +16,24 @@ char someFunctionName[ 128 ] = "";
 
 void onFunctionDeclarationDetected()
 {
-
+    char log[ 64 ];
+    snprintf( log, 64, "Function declaration detected: %s", someFunctionName );
+    LOG_DEBUG( log );
 }
 
 void onFunctionDefinitionDetected()
 {
     char log[ 64 ];
     snprintf( log, 64, "Function definition detected: %s", someFunctionName );
+    LOG_DEBUG( log );
+}
+
+void saveFuncName()
+{
+    strcpy( someFunctionName, someName );
+
+    char log[ 64 ];
+    snprintf( log, 64, "Something like function: %s", someFunctionName );
     LOG_DEBUG( log );
 }
 
@@ -50,20 +61,20 @@ c_entries:
 	c_entries c_entry;
 
 c_entry:
+    c_function_declaration |
 	c_function_definition;
 
 
 /* ======= C-FUNCTIONS =========== */
 
 c_function_declaration:
-	ret_value SOME_NAME OPEN_CIRCLE_BRACKET function_params CLOSE_CITCLE_BRACKET SEMICOLON
+	ret_value SOME_NAME OPEN_CIRCLE_BRACKET { saveFuncName(); } function_params CLOSE_CITCLE_BRACKET SEMICOLON
 		// int foo() ;
     { onFunctionDeclarationDetected(); };
 
 c_function_definition:
-	ret_value		     					                                    // int
-	SOME_NAME OPEN_CIRCLE_BRACKET { strcpy( someFunctionName, someName ); }     // foo (
-	function_params CLOSE_CITCLE_BRACKET                                        //      ... )
+	ret_value SOME_NAME OPEN_CIRCLE_BRACKET { saveFuncName(); }                 // int foo (
+	function_params CLOSE_CITCLE_BRACKET                                        //           ... )
 	OBRACE	 							                                        // {
 	function_entries							                                //    ....
 	EBRACE								                                        // }
@@ -76,7 +87,7 @@ ret_value:
 	some_type;
 
 function_params:
-	function_param | function_param COMMON function_params;		// int a, double b, char c
+	function_param | function_param COMMON function_params | /* nothing */;		// int a, double b, char c
 
 function_param:
 	some_type SOME_NAME;		// int t;
@@ -124,8 +135,11 @@ function_entrie:
 	c_expr;
 
 return_line:
-	RETURN SOME_NAME SEMICOLON;
-	// TODO: return expressions. Now work only "return a;"
+	RETURN var_or_number SEMICOLON |
+	RETURN c_expr SEMICOLON;
+
+var_or_number:
+    var_name | NUMBER ;
 
 /* TODO: "struct T t"; , "enum T t;" + pointers: "int * p;"
 ** TODO: math expr : "int t = a + b * 2;" */
@@ -167,20 +181,21 @@ assign_right_expr:
     NUMBER | var_name | c_expr
 
 c_expr:
+    UNARY_OPERATOR var_or_number | UNARY_OPERATOR c_expr |
     left_operand BINARY_OPERATOR right_operand;
 
 left_operand:
-    NUMBER | var_name;
+    var_or_number;
 
 right_operand:
-    NUMBER | var_name | c_expr;
+    var_or_number | c_expr;
 
 var_name:
     SOME_NAME;
 
 %%
 
-void yyerror(char *s)
+void yyerror( char* s )
 {
     ++numError;
 

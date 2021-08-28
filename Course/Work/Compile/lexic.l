@@ -81,7 +81,9 @@ return                          NEW_TOKEN( RETURN );
 \||\|\||&|&&|\%|\^              NEW_TOKEN( BINARY_OPERATOR );
 \<\<|>>                         NEW_TOKEN( BINARY_OPERATOR );
 
-[0-9]*                          NEW_TOKEN( NUMBER );
+\+\+|\-\-                       NEW_TOKEN( UNARY_OPERATOR );
+
+[0-9|.]*|[0-9|.]*f              NEW_TOKEN( NUMBER );
 
 [a-zA-Z][a-zA-Z0-9|_]*          onSomeName(); NEW_TOKEN( SOME_NAME );
 
