@@ -75,12 +75,15 @@ extern int yydebug;
     SOME_NAME = 276,               /* SOME_NAME  */
     COMMON = 277,                  /* COMMON  */
     SEMICOLON = 278,               /* SEMICOLON  */
-    EBRACE = 279,                  /* EBRACE  */
-    OBRACE = 280,                  /* OBRACE  */
-    OPEN_CIRCLE_BRACKET = 281,     /* OPEN_CIRCLE_BRACKET  */
-    CLOSE_CITCLE_BRACKET = 282,    /* CLOSE_CITCLE_BRACKET  */
-    OPEN_SQUARE_BRACKET = 283,     /* OPEN_SQUARE_BRACKET  */
-    CLOSE_SQUARE_BRACKET = 284     /* CLOSE_SQUARE_BRACKET  */
+    BINARY_OPERATOR = 279,         /* BINARY_OPERATOR  */
+    UNARY_OPERATOR = 280,          /* UNARY_OPERATOR  */
+    BINARY_OPERATOR_ASSIGN = 281,  /* BINARY_OPERATOR_ASSIGN  */
+    EBRACE = 282,                  /* EBRACE  */
+    OBRACE = 283,                  /* OBRACE  */
+    OPEN_CIRCLE_BRACKET = 284,     /* OPEN_CIRCLE_BRACKET  */
+    CLOSE_CITCLE_BRACKET = 285,    /* CLOSE_CITCLE_BRACKET  */
+    OPEN_SQUARE_BRACKET = 286,     /* OPEN_SQUARE_BRACKET  */
+    CLOSE_SQUARE_BRACKET = 287     /* CLOSE_SQUARE_BRACKET  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
