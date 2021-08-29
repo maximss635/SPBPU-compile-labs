@@ -16,7 +16,7 @@ char someFunctionName[ 128 ] = "";
 void saveFuncName()
 {
     strcpy( someFunctionName, someName );
-    // LOG_DEBUG_FMT( "Something like function: %s", someFunctionName );
+    LOG_DEBUG_FMT( "Start parsing function: %s", someFunctionName );
 }
 
 %}
@@ -29,13 +29,8 @@ void saveFuncName()
 
 /* Special tokens */
 %token IF ELSE WHILE DO FOR RETURN INLINE
-
-%token NUMBER SOME_NAME COMMON SEMICOLON
-
-%token BINARY_OPERATOR UNARY_OPERATOR BINARY_OPERATOR_ASSIGN
-
-/* Brackets */
-%token EBRACE OBRACE OPEN_CIRCLE_BRACKET CLOSE_CITCLE_BRACKET OPEN_SQUARE_BRACKET CLOSE_SQUARE_BRACKET
+%token NUMBER SOME_NAME
+%token BINARY_OPERATOR UNARY_OPERATOR
 
 %%
 c_entries:
@@ -49,33 +44,33 @@ c_entry:
 /* ======= C-FUNCTIONS =========== */
 
 c_function_declaration:
-	ret_value SOME_NAME OPEN_CIRCLE_BRACKET { saveFuncName(); } function_params CLOSE_CITCLE_BRACKET SEMICOLON
+	ret_value SOME_NAME '(' { saveFuncName(); } function_params ')' ';'
 		// int foo() ;
     { onBlockDetected( FunctionDeclaration ) };
 
 c_function_definition:
-	ret_value SOME_NAME OPEN_CIRCLE_BRACKET { saveFuncName(); }                 // int foo (
-	function_params CLOSE_CITCLE_BRACKET                                        //           ... )
-	OBRACE	 							                                        // {
+	ret_value SOME_NAME '(' { saveFuncName(); }                                 // int foo (
+	function_params ')'                                                         //           ... )
+	'{'	 							                                            // {
 	function_entries							                                //    ....
-	EBRACE								                                        // }
+	'}'								                                            // }
 	{ onBlockDetected( FunctionDefinition ); };
 
 c_function_call:
-    SOME_NAME OPEN_CIRCLE_BRACKET instances_to_stack CLOSE_CITCLE_BRACKET;		// foo( a, b, 2 )
+    SOME_NAME '(' instances_to_stack ')';		// foo( a, b, 2 )
 
 ret_value:
 	some_type | INLINE some_type;
 
 function_params:
-	function_param COMMON function_params | function_param | /* nothing */;		// int a, double b, char c
+	function_param ',' function_params | function_param | /* nothing */;		// int a, double b, char c
 
 function_param:
 	some_type SOME_NAME;		// int t;
 					// TODO: struct, union, enum, pointers
 
 instances_to_stack:
-	instance_to_stack COMMON instances_to_stack | instance_to_stack | /* nothing */ ;	// a, b, 2 + t
+	instance_to_stack ',' instances_to_stack | instance_to_stack | /* nothing */ ;	// a, b, 2 + t
 
 instance_to_stack:
 	instance_name | NUMBER | c_expr;
@@ -106,64 +101,75 @@ function_entries:
 	function_entrie ;
 
 function_entrie:
-	cycle_for |			        // for ( ... ) { ... }
-	cycle_while | 			    // while ( ... ) { ... }
-	c_conditional | 		    // if ( ... ) { ... } else { ... }
-	cycle_do_while |		    // do { ... } while ( ... ) ;
-	c_instance_declaration | 	// int t;
-	return_line |			    // return a + b * c;
-	c_expr SEMICOLON;           // ...
+	cycle_for |			                                // for ( ... ) { ... }
+	cycle_while | 			                            // while ( ... ) { ... }
+	c_conditional | 		                            // if ( ... ) { ... } else { ... }
+	cycle_do_while |		                            // do { ... } while ( ... ) ;
+	c_local_instance_declaration ';' | 	                // int t;
+	return_line ';' |			                        // return a + b * c;
+	c_expr ';' |                                        // ...
+    /* empty */ ;
 
 return_line:
-	RETURN var_or_number SEMICOLON |
-	RETURN c_expr SEMICOLON;
+	RETURN var_or_number |
+	RETURN c_expr;
 
 var_or_number:
     var_name | NUMBER ;
 
-/* TODO: "struct T t"; , "enum T t;" + pointers: "int * p;"
-** TODO: math expr : "int t = a + b * 2;" */
-c_instance_declaration:
-    some_type c_instances_declarations_in_common SEMICOLON;             // double ... , ... , ... ;
+/* TODO: "struct T t"; , "enum T t;" + pointers: "int * p;" */
+c_local_instance_declaration:
+    some_type c_instances_declarations_in_common ;             // double ... , ... , ...
 
 c_instances_declarations_in_common:
-    c_decl_var_equal_number COMMON c_instances_declarations_in_common | c_decl_var_equal_number;
+    c_decl_var_equal_number ',' c_instances_declarations_in_common | c_decl_var_equal_number;
         //  a = 1, b = 2, c = 4;
 
 c_decl_var_equal_number:
-    var_name BINARY_OPERATOR_ASSIGN assign_right_expr | var_name;
+    var_or_array '=' assign_right_expr { onBlockDetected( LocalInstanceDeclaration ); }
+    | var_or_array { onBlockDetected( LocalInstanceDeclaration ); };
+
+var_or_array:
+    var_name '[' NUMBER ']' | var_name '[' var_name ']' | var_name;
 
 cycle_do_while:
 	DO 											                                        // do
 	body                                                                                //     ...
-	WHILE OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET SEMICOLON;	        // while ( ... ) ;
+	WHILE '(' cond_in_brackets ')' ';' ;	                                            // while ( ... ) ;
 
 cycle_while:
-	WHILE OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET			        // while ( ... )
-	body;                                                                           //     ...
+	WHILE '(' cond_in_brackets ')'			                                        // while ( ... )
+	body                                                                            //     { ... }
+    |
+	WHILE '(' cond_in_brackets ')'			                                        // while ( ... )
+	function_entrie;                                                                //     ...
 
 cond_in_brackets:
     NUMBER | instance_name | c_expr;
 
 cond_in_brackets_for:
-    ;
+    c_expr ';' c_expr ';' c_expr |                                      // ( ... ; ... ; ... )
+    c_local_instance_declaration ';' c_expr ';' c_expr ;                // ( double ... ; ... ; ... )
 
 body:
-	OBRACE											                                    // {
-	body_entries									                                    // 	...
-	EBRACE											                                    // }
+	'{'											                                    // {
+	body_entries									                                // 	...
+	'}'											                                    // }
 
 cycle_for:
-	FOR OPEN_CIRCLE_BRACKET cond_in_brackets_for CLOSE_CITCLE_BRACKET			    // for ( ... ; ... ; ... )
-	body;                                                                           //     ...
+	FOR '(' cond_in_brackets_for ')'			                                    // for ( ... ; ... ; ... )
+	body                                                                            //     { ... }
+	|
+	FOR '(' cond_in_brackets_for ')'			                                    // for ( ... ; ... ; ... )
+	function_entrie;                                                                //     ...
 
 c_conditional:
-	IF OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET            // if ( ... )
+	IF '(' cond_in_brackets ')'                                             // if ( ... )
     { onBlockDetected( IfCond ); }
 	body                                                                    //     {...}
 	{ onBlockDetected( IfBody ); }
     else_cases |
-	IF OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET            // if ( ... )
+	IF '(' cond_in_brackets ')'                                             // if ( ... )
     { onBlockDetected( IfCond ); }
     function_entrie										                    // 	    ...
     { onBlockDetected( IfBody ); }
@@ -190,19 +196,35 @@ c_expr:
     var_or_number UNARY_OPERATOR | c_expr UNARY_OPERATOR |
     left_operand binary_operator right_operand |
     c_expr_in_brackets |
-    c_function_call;
+    c_function_call |
+    tern_operator;
 
-binary_operator:
-    BINARY_OPERATOR | BINARY_OPERATOR_ASSIGN;
+tern_operator:
+    operand1 '?' operand2 ':' operand3 ;
 
-c_expr_in_brackets:
-    OPEN_CIRCLE_BRACKET c_expr CLOSE_CITCLE_BRACKET;
+operand1:
+    array_item | var_or_number | c_expr;
+
+operand2:
+    array_item | var_or_number | c_expr;
+
+operand3:
+    array_item | var_or_number | c_expr;
 
 left_operand:
-    var_or_number | c_expr;
+    array_item | var_or_number | c_expr;
 
 right_operand:
-    var_or_number | c_expr;
+    array_item | var_or_number | c_expr;
+
+binary_operator:
+    BINARY_OPERATOR | '=';
+
+c_expr_in_brackets:
+    '(' c_expr ')';
+
+array_item:
+    var_name '[' SOME_NAME ']' | var_name '[' NUMBER ']';
 
 var_name:
     SOME_NAME;

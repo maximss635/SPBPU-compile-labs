@@ -1,3 +1,5 @@
+void empty(){}
+
 int instancesDeclarations( int a )
 {
     static char A = 1, B = 2, C = 3, D = 4 ;
@@ -61,4 +63,41 @@ void conditions( int a, int b, int c, int d, int e, int g )
     {
         foo(a);
     }
+}
+
+void cycles()
+{
+    int a = 0;
+    int b = 0;
+    int c = 0;
+
+    while ( ( a + b - c == d - 1 && ( 1 << 2 % 2 ) ) && foo( 2 ) || (1 > 2) && (2<1) )
+        a++;
+
+    while ( ( a + b - c == d - 1 && ( 1 << 2 % 2 ) ) && foo( 2 ) || (1 > 2) && (2<1) )
+    {
+        a++;
+        b++;
+        c++;
+    }
+
+    int A[ 100 ], B[ 100 ], C[ 100 ];
+    for ( int i = 0; i < 100; ++i )
+    {
+        A[ i ] = 0;
+        B[ i ] = 0;
+        C[ i ] = 0;
+    }
+
+    for ( int i = 0; i < 100; ++i )
+        C[i] = A[     i  ] + B[i];
+
+    do { } while ( --a );
+}
+
+void ternOperator( int t )
+{
+    foo( t > 5 ? 1 : 2 );
+
+    return t < 3 ? foo( 3 ) : foo( 1 );
 }

@@ -47,6 +47,11 @@ void onBlockDetected( enum BlockKind blockKind )
         LOG_DEBUG_FMT( "Function declaration detected: %s", someFunctionName );
         break;
 
+    case LocalInstanceDeclaration:
+        LOG_DEBUG_FMT( "Local instance declaration detected in function \"%s\": %s",
+                       someFunctionName, someName )
+        break;
+
     case IfCond:
         //LOG_DEBUG_FMT( "If condition detected at line: %d", yylval );
         break;

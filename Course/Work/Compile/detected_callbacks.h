@@ -13,7 +13,8 @@ enum BlockKind
     FunctionDefinition,
     FunctionDeclaration,
     IfCond, IfBody,
-    ElseCond, ElseBody
+    ElseCond, ElseBody,
+    LocalInstanceDeclaration
 };
 
 enum TokenKind

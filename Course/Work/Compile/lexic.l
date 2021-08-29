@@ -29,13 +29,17 @@ inline                          NEW_TOKEN( INLINE );
 
 (\r\n)|\n                       onTokenDetected( Enter ); yylval++;
 
-,                               NEW_TOKEN( COMMON );
-;                               NEW_TOKEN( SEMICOLON );
+,                               NEW_TOKEN( ',' );
+;                               NEW_TOKEN( ';' );
+\?                               NEW_TOKEN( '?' );
+:                               NEW_TOKEN( ':' );
 
-\{                              NEW_TOKEN( OBRACE );
-\}                              NEW_TOKEN( EBRACE );
-\(                              NEW_TOKEN( OPEN_CIRCLE_BRACKET );
-\)                              NEW_TOKEN( CLOSE_CITCLE_BRACKET );
+\{                              NEW_TOKEN( '{' );
+\}                              NEW_TOKEN( '}' );
+\(                              NEW_TOKEN( '(' );
+\)                              NEW_TOKEN( ')' );
+\[                              NEW_TOKEN( '[' );
+\]                              NEW_TOKEN( ']' );
 
 if                              NEW_TOKEN( IF );
 else                            NEW_TOKEN( ELSE );
@@ -46,7 +50,7 @@ return                          NEW_TOKEN( RETURN );
 
 \+|\-|\*|\/                     NEW_TOKEN( BINARY_OPERATOR );
 ==|!=|\>|\>=|<|<=               NEW_TOKEN( BINARY_OPERATOR );
-=                               NEW_TOKEN( BINARY_OPERATOR_ASSIGN );
+=                               NEW_TOKEN( '=' );
 \||\|\||&|&&|\%|\^              NEW_TOKEN( BINARY_OPERATOR );
 \<\<|>>                         NEW_TOKEN( BINARY_OPERATOR );
 
