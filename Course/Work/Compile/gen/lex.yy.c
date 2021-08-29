@@ -521,45 +521,14 @@ char *yytext;
 #include <string.h>
 
 #include "grammar.tab.h"
+#include "detected_callbacks.h"
 
 #define NEW_TOKEN( token ) \
-    onToken(); \
+    onTokenDetected( Default ); \
     return token;
 
-extern char curLine[ 128 ];
-extern char prevLine[ 128 ];
-extern char someName[ 128 ];
-
-void onToken()
-{
-    if ( strlen( curLine ) > 128 )
-    {
-        fprintf( stdout, "[ERROR] Too long line: %s\n", curLine );
-        exit( -1 );
-    }
-    strcat( curLine, yytext );
-}
-
-void onEnter()
-{
-    strcpy( prevLine, curLine );  // clear
-    strcpy( curLine, "" );
-    yylval++;
-}
-
-void onSomeName()
-{
-    if ( strlen( yytext ) > 128 )
-    {
-        fprintf( stdout, "[ERROR] Too long name: %s", yytext );
-        exit( -1 );
-    }
-
-    strcpy( someName, yytext );
-}
-
-#line 561 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
-#line 562 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+#line 530 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+#line 531 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
 
 #define INITIAL 0
 
@@ -776,9 +745,9 @@ YY_DECL
 		}
 
 	{
-#line 45 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 14 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 
-#line 781 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+#line 750 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -837,181 +806,181 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 46 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 15 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_INT );
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 47 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 16 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_FLOAT );
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 48 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 17 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_DOUBLE );
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 49 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 18 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_CHAR );
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 50 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 19 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_PREFIX_LONG );
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 51 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 20 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_PREFIX_UNSIGNED );
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 52 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 21 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_PREFIX_SIGNED );
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 53 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 22 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_VOID );
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 54 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 23 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_PREFIX_STATIC );
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 55 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 24 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_PREFIX_EXTERN );
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 56 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 25 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( TYPE_PREFIX_CONST );
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 57 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 26 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( INLINE );
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 59 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-onToken();
+#line 28 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+onTokenDetected( Default );
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 61 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-onEnter();
+#line 30 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+onTokenDetected( Enter ); yylval++;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 63 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 32 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( COMMON );
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 64 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 33 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( SEMICOLON );
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 66 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 35 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( OBRACE );
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 67 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 36 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( EBRACE );
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 68 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 37 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( OPEN_CIRCLE_BRACKET );
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 69 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 38 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( CLOSE_CITCLE_BRACKET );
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 71 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 40 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( IF );
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 72 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 41 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( ELSE );
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 73 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 42 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( DO );
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 74 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 43 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( WHILE );
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 75 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 44 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( FOR );
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 76 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 45 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( RETURN );
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 78 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 47 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 79 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 48 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 80 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 49 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( BINARY_OPERATOR_ASSIGN );
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 81 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 50 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 82 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 51 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 84 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 53 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( UNARY_OPERATOR );
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 86 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 55 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( NUMBER );
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 88 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-onSomeName(); NEW_TOKEN( SOME_NAME );
+#line 57 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 90 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 59 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 ECHO;
 	YY_BREAK
-#line 1014 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+#line 983 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2016,6 +1985,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 90 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 59 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 
 

@@ -1,13 +1,11 @@
 %{
-#include <stdio.h>
-#include <string.h>
-
-#define LOG_DEBUG( msg ) printf( "[DEBUG] %s\n", msg );
+#include "detected_callbacks.h"
 
 void yyerror( char* s ) ;
 int yylex();
 
 extern FILE* yyin;
+extern char *yytext;
 
 int numError = 0;
 char curLine[ 128 ] = "";
@@ -15,27 +13,10 @@ char prevLine[ 128 ] = "";
 char someName[ 128 ] = "";
 char someFunctionName[ 128 ] = "";
 
-void onFunctionDeclarationDetected()
-{
-    char log[ 64 ];
-    snprintf( log, 64, "Function declaration detected: %s", someFunctionName );
-    LOG_DEBUG( log );
-}
-
-void onFunctionDefinitionDetected()
-{
-    char log[ 64 ];
-    snprintf( log, 64, "Function definition detected: %s", someFunctionName );
-    LOG_DEBUG( log );
-}
-
 void saveFuncName()
 {
     strcpy( someFunctionName, someName );
-
-    char log[ 64 ];
-    snprintf( log, 64, "Something like function: %s", someFunctionName );
-    LOG_DEBUG( log );
+    // LOG_DEBUG_FMT( "Something like function: %s", someFunctionName );
 }
 
 %}
@@ -70,7 +51,7 @@ c_entry:
 c_function_declaration:
 	ret_value SOME_NAME OPEN_CIRCLE_BRACKET { saveFuncName(); } function_params CLOSE_CITCLE_BRACKET SEMICOLON
 		// int foo() ;
-    { onFunctionDeclarationDetected(); };
+    { onBlockDetected( FunctionDeclaration ) };
 
 c_function_definition:
 	ret_value SOME_NAME OPEN_CIRCLE_BRACKET { saveFuncName(); }                 // int foo (
@@ -78,10 +59,10 @@ c_function_definition:
 	OBRACE	 							                                        // {
 	function_entries							                                //    ....
 	EBRACE								                                        // }
-	{ onFunctionDefinitionDetected(); };
+	{ onBlockDetected( FunctionDefinition ); };
 
 c_function_call:
-    { LOG_DEBUG("call?"); } SOME_NAME OPEN_CIRCLE_BRACKET instances_to_stack CLOSE_CITCLE_BRACKET;		// foo( a, b, 2 )
+    SOME_NAME OPEN_CIRCLE_BRACKET instances_to_stack CLOSE_CITCLE_BRACKET;		// foo( a, b, 2 )
 
 ret_value:
 	some_type | INLINE some_type;
@@ -131,9 +112,7 @@ function_entrie:
 	cycle_do_while |		    // do { ... } while ( ... ) ;
 	c_instance_declaration | 	// int t;
 	return_line |			    // return a + b * c;
-
-{LOG_DEBUG("here");}c_expr SEMICOLON |
-	c_function_call SEMICOLON; // foo();
+	c_expr SEMICOLON;           // ...
 
 return_line:
 	RETURN var_or_number SEMICOLON |
@@ -145,7 +124,7 @@ var_or_number:
 /* TODO: "struct T t"; , "enum T t;" + pointers: "int * p;"
 ** TODO: math expr : "int t = a + b * 2;" */
 c_instance_declaration:
-	some_type c_instances_declarations_in_common SEMICOLON;             // double ... , ... , ... ;
+    some_type c_instances_declarations_in_common SEMICOLON;             // double ... , ... , ... ;
 
 c_instances_declarations_in_common:
     c_decl_var_equal_number COMMON c_instances_declarations_in_common | c_decl_var_equal_number;
@@ -156,46 +135,49 @@ c_decl_var_equal_number:
 
 cycle_do_while:
 	DO 											                                        // do
-	OBRACE											                                    // {
-	body_entries									                                    // 	...
-	EBRACE											                                    // }
+	body                                                                                //     ...
 	WHILE OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET SEMICOLON;	        // while ( ... ) ;
 
 cycle_while:
 	WHILE OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET			        // while ( ... )
-	OBRACE											                                // {
-	body_entries										                            // 	...
-	EBRACE;											                                // }
+	body;                                                                           //     ...
 
 cond_in_brackets:
-    c_expr;
+    NUMBER | instance_name | c_expr;
 
 cond_in_brackets_for:
     ;
 
+body:
+	OBRACE											                                    // {
+	body_entries									                                    // 	...
+	EBRACE											                                    // }
+
 cycle_for:
 	FOR OPEN_CIRCLE_BRACKET cond_in_brackets_for CLOSE_CITCLE_BRACKET			    // for ( ... ; ... ; ... )
-	OBRACE											                                // {
-	body_entries										                            // 	...
-	EBRACE;											                                // }
+	body;                                                                           //     ...
 
 c_conditional:
 	IF OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET            // if ( ... )
-	OBRACE											                        // {
-    body_entries										                    // 	...
-    EBRACE											                        // }
+    { onBlockDetected( IfCond ); }
+	body                                                                    //     {...}
+	{ onBlockDetected( IfBody ); }
     else_cases |
 	IF OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET            // if ( ... )
-    body_entries										                    // 	    ...
+    { onBlockDetected( IfCond ); }
+    function_entrie										                    // 	    ...
+    { onBlockDetected( IfBody ); }
     else_cases;
 
 else_cases:
     ELSE                                                                    // else
-    OBRACE											                        // {
-    body_entries										                    // 	...
-    EBRACE |                                                                // }
-    ELSE                                                                    // else
-    body_entries | /* nothing */ ;                                          // 	  ...
+	{ onBlockDetected( ElseCond ); }
+	body                                                                    //     {...}
+	| ELSE                                                                  // else
+    { onBlockDetected( ElseCond ); }                                        //  ...
+    function_entrie
+    { onBlockDetected( ElseBody ); }
+    | /* nothing */ ;
 
 body_entries:
     function_entries;
@@ -207,7 +189,8 @@ c_expr:
     UNARY_OPERATOR var_or_number | UNARY_OPERATOR c_expr |
     var_or_number UNARY_OPERATOR | c_expr UNARY_OPERATOR |
     left_operand binary_operator right_operand |
-    c_expr_in_brackets ;
+    c_expr_in_brackets |
+    c_function_call;
 
 binary_operator:
     BINARY_OPERATOR | BINARY_OPERATOR_ASSIGN;

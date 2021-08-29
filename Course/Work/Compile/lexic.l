@@ -3,42 +3,11 @@
 #include <string.h>
 
 #include "grammar.tab.h"
+#include "detected_callbacks.h"
 
 #define NEW_TOKEN( token ) \
-    onToken(); \
+    onTokenDetected( Default ); \
     return token;
-
-extern char curLine[ 128 ];
-extern char prevLine[ 128 ];
-extern char someName[ 128 ];
-
-void onToken()
-{
-    if ( strlen( curLine ) > 128 )
-    {
-        fprintf( stdout, "[ERROR] Too long line: %s\n", curLine );
-        exit( -1 );
-    }
-    strcat( curLine, yytext );
-}
-
-void onEnter()
-{
-    strcpy( prevLine, curLine );  // clear
-    strcpy( curLine, "" );
-    yylval++;
-}
-
-void onSomeName()
-{
-    if ( strlen( yytext ) > 128 )
-    {
-        fprintf( stdout, "[ERROR] Too long name: %s", yytext );
-        exit( -1 );
-    }
-
-    strcpy( someName, yytext );
-}
 
 %}
 
@@ -56,9 +25,9 @@ extern                          NEW_TOKEN( TYPE_PREFIX_EXTERN );
 const                           NEW_TOKEN( TYPE_PREFIX_CONST );
 inline                          NEW_TOKEN( INLINE );
 
-[ \t]+                          onToken();
+[ \t]+                          onTokenDetected( Default );
 
-(\r\n)|\n                       onEnter();
+(\r\n)|\n                       onTokenDetected( Enter ); yylval++;
 
 ,                               NEW_TOKEN( COMMON );
 ;                               NEW_TOKEN( SEMICOLON );
@@ -85,6 +54,6 @@ return                          NEW_TOKEN( RETURN );
 
 [0-9|.]*|[0-9|.]*f              NEW_TOKEN( NUMBER );
 
-[a-zA-Z][a-zA-Z0-9|_]*          onSomeName(); NEW_TOKEN( SOME_NAME );
+[a-zA-Z][a-zA-Z0-9|_]*          onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
 
 %%

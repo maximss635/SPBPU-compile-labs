@@ -3,13 +3,15 @@ project(Compile)
 
 set(CMAKE_C_STANDARD 99)
 
+include_directories( ${CMAKE_SOURCE_DIR} )
+
 find_package(BISON REQUIRED)
 set(BisonOutput ${CMAKE_SOURCE_DIR}/gen/grammar.tab.c)
 IF(BISON_FOUND)
     add_custom_command(
             OUTPUT ${BisonOutput}
             COMMAND ${BISON_EXECUTABLE}
-            -o ${CMAKE_SOURCE_DIR}/gen/grammar.tab.c -d
+            -o ${CMAKE_SOURCE_DIR}/gen/grammar.tab.c -d --verbose
             ${CMAKE_SOURCE_DIR}/grammar.y
             COMMENT "Generating grammar.tab.c/grammar.tab.h"
     )
@@ -27,7 +29,9 @@ IF(FLEX_FOUND)
     )
 ENDIF()
 
-add_executable(Compile
+set( SOURCE
+        detected_callbacks.c
         ${BisonOutput}
-        ${FlexOutput}
-        )
+        ${FlexOutput})
+
+add_executable(Compile ${SOURCE} )
