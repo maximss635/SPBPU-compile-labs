@@ -20,7 +20,6 @@ void onToken()
         exit( -1 );
     }
     strcat( curLine, yytext );
-    strcat( curLine, " " );
 }
 
 void onEnter()
@@ -55,8 +54,9 @@ void                            NEW_TOKEN( TYPE_VOID );
 static                          NEW_TOKEN( TYPE_PREFIX_STATIC );
 extern                          NEW_TOKEN( TYPE_PREFIX_EXTERN );
 const                           NEW_TOKEN( TYPE_PREFIX_CONST );
+inline                          NEW_TOKEN( INLINE );
 
-[ \t]+                          /* игнорируем пробелы и знаки табуляции */
+[ \t]+                          onToken();
 
 (\r\n)|\n                       onEnter();
 

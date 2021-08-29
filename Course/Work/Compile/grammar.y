@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include <string.h>
 
 #define LOG_DEBUG( msg ) printf( "[DEBUG] %s\n", msg );
 
@@ -46,7 +47,7 @@ void saveFuncName()
 %token TYPE_PREFIX_UNSIGNED TYPE_PREFIX_SIGNED TYPE_VOID TYPE_PREFIX_STATIC TYPE_PREFIX_EXTERN TYPE_PREFIX_CONST
 
 /* Special tokens */
-%token IF ELSE WHILE DO FOR RETURN
+%token IF ELSE WHILE DO FOR RETURN INLINE
 
 %token NUMBER SOME_NAME COMMON SEMICOLON
 
@@ -57,11 +58,10 @@ void saveFuncName()
 
 %%
 c_entries:
-	c_entry |
-	c_entries c_entry;
+	c_entry c_entries |
+	c_entry ;
 
 c_entry:
-    c_function_declaration |
 	c_function_definition;
 
 
@@ -81,23 +81,23 @@ c_function_definition:
 	{ onFunctionDefinitionDetected(); };
 
 c_function_call:
-	SOME_NAME OPEN_CIRCLE_BRACKET instances_to_stack CLOSE_CITCLE_BRACKET SEMICOLON		// foo( a, b, 2 ) ;
+    { LOG_DEBUG("call?"); } SOME_NAME OPEN_CIRCLE_BRACKET instances_to_stack CLOSE_CITCLE_BRACKET;		// foo( a, b, 2 )
 
 ret_value:
-	some_type;
+	some_type | INLINE some_type;
 
 function_params:
-	function_param | function_param COMMON function_params | /* nothing */;		// int a, double b, char c
+	function_param COMMON function_params | function_param | /* nothing */;		// int a, double b, char c
 
 function_param:
 	some_type SOME_NAME;		// int t;
 					// TODO: struct, union, enum, pointers
 
 instances_to_stack:
-	instance_to_stack | instance_to_stack COMMON instances_to_stack;	// a, b, 2 + t
+	instance_to_stack COMMON instances_to_stack | instance_to_stack | /* nothing */ ;	// a, b, 2 + t
 
 instance_to_stack:
-	instance_name;
+	instance_name | NUMBER | c_expr;
 
 instance_name:
 	SOME_NAME;
@@ -121,18 +121,19 @@ some_type_primitive:
 /* ========= MAIN C-Code ============ */
 
 function_entries:
-	function_entrie |
-	function_entrie function_entries;
+	function_entrie function_entries |
+	function_entrie ;
 
 function_entrie:
 	cycle_for |			        // for ( ... ) { ... }
 	cycle_while | 			    // while ( ... ) { ... }
 	c_conditional | 		    // if ( ... ) { ... } else { ... }
 	cycle_do_while |		    // do { ... } while ( ... ) ;
-	c_function_call |		    // foo();
 	c_instance_declaration | 	// int t;
 	return_line |			    // return a + b * c;
-	c_expr;
+
+{LOG_DEBUG("here");}c_expr SEMICOLON |
+	c_function_call SEMICOLON; // foo();
 
 return_line:
 	RETURN var_or_number SEMICOLON |
@@ -158,34 +159,64 @@ cycle_do_while:
 	OBRACE											                                    // {
 	body_entries									                                    // 	...
 	EBRACE											                                    // }
-	WHILE OPEN_CIRCLE_BRACKET expression_in_brackets CLOSE_CITCLE_BRACKET SEMICOLON;	// while ( ... )
+	WHILE OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET SEMICOLON;	        // while ( ... ) ;
 
 cycle_while:
-	WHILE OPEN_CIRCLE_BRACKET expression_in_brackets CLOSE_CITCLE_BRACKET			// while ( ... )
+	WHILE OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET			        // while ( ... )
 	OBRACE											                                // {
 	body_entries										                            // 	...
 	EBRACE;											                                // }
 
-expression_in_brackets:
+cond_in_brackets:
+    c_expr;
+
+cond_in_brackets_for:
+    ;
 
 cycle_for:
-	// TODO
+	FOR OPEN_CIRCLE_BRACKET cond_in_brackets_for CLOSE_CITCLE_BRACKET			    // for ( ... ; ... ; ... )
+	OBRACE											                                // {
+	body_entries										                            // 	...
+	EBRACE;											                                // }
 
 c_conditional:
-	// TODO
+	IF OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET            // if ( ... )
+	OBRACE											                        // {
+    body_entries										                    // 	...
+    EBRACE											                        // }
+    else_cases |
+	IF OPEN_CIRCLE_BRACKET cond_in_brackets CLOSE_CITCLE_BRACKET            // if ( ... )
+    body_entries										                    // 	    ...
+    else_cases;
+
+else_cases:
+    ELSE                                                                    // else
+    OBRACE											                        // {
+    body_entries										                    // 	...
+    EBRACE |                                                                // }
+    ELSE                                                                    // else
+    body_entries | /* nothing */ ;                                          // 	  ...
 
 body_entries:
-	// TODO
+    function_entries;
 
 assign_right_expr:
-    NUMBER | var_name | c_expr
+    NUMBER | var_name | c_expr;
 
 c_expr:
     UNARY_OPERATOR var_or_number | UNARY_OPERATOR c_expr |
-    left_operand BINARY_OPERATOR right_operand;
+    var_or_number UNARY_OPERATOR | c_expr UNARY_OPERATOR |
+    left_operand binary_operator right_operand |
+    c_expr_in_brackets ;
+
+binary_operator:
+    BINARY_OPERATOR | BINARY_OPERATOR_ASSIGN;
+
+c_expr_in_brackets:
+    OPEN_CIRCLE_BRACKET c_expr CLOSE_CITCLE_BRACKET;
 
 left_operand:
-    var_or_number;
+    var_or_number | c_expr;
 
 right_operand:
     var_or_number | c_expr;
@@ -200,7 +231,7 @@ void yyerror( char* s )
     ++numError;
 
     fprintf( stderr, "[ERROR] %s\n", s );
-    fprintf( stderr, "          Line number: %d\n", yylval );
+    fprintf( stderr, "          Line number: %d\n", yylval + 1 );
     fprintf( stderr, "          Current line: \"%s\"\n", curLine );
     fprintf( stderr, "          Previous line: \"%s\"\n", prevLine );
 }
