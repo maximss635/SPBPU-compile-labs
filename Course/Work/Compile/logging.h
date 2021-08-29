@@ -15,7 +15,8 @@ enum BlockKind
     IfCond, IfBody,
     ElseCond, ElseBody,
     LocalInstanceDeclaration,
-    OneLineComment, MultiLineComment
+    OneLineComment, MultiLineComment,
+    StringConstant
 };
 
 enum TokenKind

@@ -15,6 +15,7 @@ extern void yyerror( char* );
 extern Context g_context;
 
 void readComment( _Bool multiline );
+void readStringConstant();
 
 %}
 
@@ -40,10 +41,14 @@ inline                          NEW_TOKEN( INLINE );
 
 (\r\n)|\n                       onTokenDetected( Enter ); yylval++;
 
-,                               NEW_TOKEN( ',' );
-;                               NEW_TOKEN( ';' );
-\?                               NEW_TOKEN( '?' );
-:                               NEW_TOKEN( ':' );
+\"                              readStringConstant();
+
+"."                             NEW_TOKEN( '.' );
+","                             NEW_TOKEN( ',' );
+";"                             NEW_TOKEN( ';' );
+"?"                             NEW_TOKEN( '?' );
+":"                             NEW_TOKEN( ':' );
+"->"                            NEW_TOKEN( ARR );
 
 \{                              NEW_TOKEN( '{' );
 \}                              NEW_TOKEN( '}' );
@@ -65,11 +70,11 @@ return                          NEW_TOKEN( RETURN );
 \||\|\||&|&&|\%|\^              NEW_TOKEN( BINARY_OPERATOR );
 \<\<|>>                         NEW_TOKEN( BINARY_OPERATOR );
 
-\+\+|\-\-                       NEW_TOKEN( UNARY_OPERATOR );
+\+\+|\-\-|!                     NEW_TOKEN( UNARY_OPERATOR );
 
 [0-9|.]*|[0-9|.]*f              NEW_TOKEN( NUMBER );
 
-[a-zA-Z][a-zA-Z0-9|_]*          onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
+[a-zA-Z|_][a-zA-Z0-9|_]*          onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
 
 %%
 
@@ -91,6 +96,7 @@ void readComment( _Bool multiline )
     		if ( c == '*' )
     		{
     			while ( ( c = input() ) == '*' ) ;
+
     			if ( c == '/' )
     			{
     			    onBlockDetected( MultiLineComment );
@@ -98,7 +104,14 @@ void readComment( _Bool multiline )
 
     			    return;
     			}
-    			if ( c == 0 ) break;
+    			else if ( c == '\n' )
+    			{
+    			    ++yylval;
+    			}
+    			else if ( c == 0 )
+    			{
+    			    break;
+    			}
     		}
     	}
 
@@ -106,7 +119,7 @@ void readComment( _Bool multiline )
     }
     else
     {
-        int cur, prev;
+        int cur, prev = 0;
         while ( ( cur = input() ) != 0 )
         {
     	    if ( cur == '\n' )
@@ -124,4 +137,33 @@ void readComment( _Bool multiline )
 
     	yyerror( "Unterminated comment\n" );
     }
+}
+
+void readStringConstant()
+{
+    int cur, prev = 0;
+    int i = 0;
+
+    while ( ( cur = input() ) != 0 )
+    {
+        g_context.stringConstant[ i++ ] = ( char )cur;
+
+        if ( i == 1024 )
+        {
+            yyerror( "Too long string constant\n" );
+            exit( -1 );
+        }
+
+        if ( cur == '\"' && prev != '\\' )
+        {
+            g_context.stringConstant[ i ] = 0;
+            onBlockDetected( StringConstant );
+
+            return ;
+        }
+
+        prev = cur;
+    }
+
+    yyerror( "Unterminated string constant\n" );
 }

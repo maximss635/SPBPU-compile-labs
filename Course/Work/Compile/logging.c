@@ -59,6 +59,11 @@ void onBlockDetected( enum BlockKind blockKind )
                        g_context.multilineCommentStartLine + 1, yylval + 1 );
         break;
 
+    case StringConstant:
+        LOG_DEBUG_FMT( "String constant detected at line %d: %s",
+                       g_context.stringConstant, yylval + 1 );
+        break;
+
     case IfCond:
         //LOG_DEBUG_FMT( "If condition detected at line: %d", yylval );
         break;

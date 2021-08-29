@@ -22,7 +22,7 @@ void saveFuncName()
 %start c_entries
 
 /* TYPES */
-%token TYPE_INT TYPE_FLOAT TYPE_DOUBLE TYPE_CHAR TYPE_PREFIX_LONG
+%token TYPE_INT TYPE_FLOAT TYPE_DOUBLE TYPE_CHAR TYPE_PREFIX_LONG ARR
 %token TYPE_PREFIX_UNSIGNED TYPE_PREFIX_SIGNED TYPE_VOID TYPE_PREFIX_STATIC TYPE_PREFIX_EXTERN TYPE_PREFIX_CONST
 
 /* Special tokens */
@@ -61,6 +61,9 @@ ret_value:
 	some_type | INLINE some_type;
 
 function_params:
+    TYPE_VOID | __function_params;
+
+__function_params:
 	function_param ',' function_params | function_param | /* nothing */;		// int a, double b, char c
 
 function_param:
@@ -143,7 +146,7 @@ cycle_while:
 	function_entrie;                                                                //     ...
 
 cond_in_brackets:
-    NUMBER | instance_name | c_expr;
+    NUMBER | instance_name | field | c_expr;
 
 cond_in_brackets_for:
     c_expr ';' c_expr ';' c_expr |                                      // ( ... ; ... ; ... )
@@ -190,9 +193,9 @@ assign_right_expr:
     NUMBER | var_name | c_expr;
 
 c_expr:
-    UNARY_OPERATOR var_or_number | UNARY_OPERATOR c_expr |
-    var_or_number UNARY_OPERATOR | c_expr UNARY_OPERATOR |
-    left_operand binary_operator right_operand |
+    UNARY_OPERATOR operand1 | UNARY_OPERATOR operand1 |
+    operand1 UNARY_OPERATOR | operand1 UNARY_OPERATOR |
+    left_operand {LOG_DEBUG("l+");} binary_operator right_operand |
     c_expr_in_brackets |
     c_function_call |
     tern_operator;
@@ -201,19 +204,27 @@ tern_operator:
     operand1 '?' operand2 ':' operand3 ;
 
 operand1:
-    array_item | var_or_number | c_expr;
+    array_item | var_or_number | field | c_expr;
 
 operand2:
-    array_item | var_or_number | c_expr;
+    array_item | var_or_number | field | c_expr;
 
 operand3:
-    array_item | var_or_number | c_expr;
+    array_item | var_or_number | field | c_expr;
 
 left_operand:
-    array_item | var_or_number | c_expr;
+    array_item | var_or_number | field | c_expr;
 
 right_operand:
-    array_item | var_or_number | c_expr;
+    array_item | var_or_number | field | c_expr;
+
+field:
+    SOME_NAME field__;
+
+field__:
+    '.' SOME_NAME field__ | '.' SOME_NAME |
+    ARR SOME_NAME field__ | ARR SOME_NAME ;
+
 
 binary_operator:
     BINARY_OPERATOR | '=';
