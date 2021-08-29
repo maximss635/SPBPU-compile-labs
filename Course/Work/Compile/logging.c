@@ -1,9 +1,7 @@
-#include "detected_callbacks.h"
+#include "logging.h"
+#include "context.h"
 
-extern char someFunctionName[ 128 ];
-extern char curLine[ 128 ];
-extern char prevLine[ 128 ];
-extern char someName[ 128 ];
+extern Context g_context;
 extern int yylval;
 
 void onTokenDetected( enum TokenKind tokenKind )
@@ -11,8 +9,8 @@ void onTokenDetected( enum TokenKind tokenKind )
     switch( tokenKind )
     {
         case Enter:
-            strcpy( prevLine, curLine );  // clear
-            strcpy( curLine, "" );
+            strcpy( g_context.prevLine, g_context.curLine );  // clear
+            strcpy( g_context.curLine, "" );
             break;
 
         case Name:
@@ -21,16 +19,16 @@ void onTokenDetected( enum TokenKind tokenKind )
                 fprintf( stdout, "[ERROR] Too long name: %s", yytext );
                 exit( -1 );
             }
-            strcpy( someName, yytext );
+            strcpy( g_context.someName, yytext );
             break;
 
         default:
-            if ( strlen( curLine ) > 128 )
+            if ( strlen( g_context.curLine ) > 128 )
             {
-                fprintf( stdout, "[ERROR] Too long line: %s\n", curLine );
+                fprintf( stdout, "[ERROR] Too long line: %s\n", g_context.curLine );
                 exit( -1 );
             }
-            strcat( curLine, yytext );
+            strcat( g_context.curLine, yytext );
             break;
     }
 }
@@ -40,16 +38,25 @@ void onBlockDetected( enum BlockKind blockKind )
     switch( blockKind )
     {
     case FunctionDefinition:
-        LOG_DEBUG_FMT( "Function definition detected: %s", someFunctionName );
+        LOG_DEBUG_FMT( "Function definition detected: %s", g_context.someFunctionName );
         break;
 
     case FunctionDeclaration:
-        LOG_DEBUG_FMT( "Function declaration detected: %s", someFunctionName );
+        LOG_DEBUG_FMT( "Function declaration detected: %s", g_context.someFunctionName );
         break;
 
     case LocalInstanceDeclaration:
         LOG_DEBUG_FMT( "Local instance declaration detected in function \"%s\": %s",
-                       someFunctionName, someName )
+                       g_context.someFunctionName, g_context.someName )
+        break;
+
+    case OneLineComment:
+        LOG_DEBUG_FMT( "Oneline comment detected: %d", yylval );
+            break;
+
+    case MultiLineComment:
+        LOG_DEBUG_FMT( "Multiline comment detected: %d - %d",
+                       g_context.multilineCommentStartLine + 1, yylval + 1 );
         break;
 
     case IfCond:

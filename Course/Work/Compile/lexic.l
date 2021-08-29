@@ -3,15 +3,26 @@
 #include <string.h>
 
 #include "grammar.tab.h"
-#include "detected_callbacks.h"
+#include "logging.h"
+#include "context.h"
 
 #define NEW_TOKEN( token ) \
     onTokenDetected( Default ); \
     return token;
 
+extern void yyerror( char* );
+
+extern Context g_context;
+
+void readComment( _Bool multiline );
+
 %}
 
 %%
+
+"/*"                            readComment( 1 );
+"//"                            readComment( 0 );
+
 int                             NEW_TOKEN( TYPE_INT );
 double                          NEW_TOKEN( TYPE_FLOAT );
 float                           NEW_TOKEN( TYPE_DOUBLE );
@@ -61,3 +72,56 @@ return                          NEW_TOKEN( RETURN );
 [a-zA-Z][a-zA-Z0-9|_]*          onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
 
 %%
+
+
+void readComment( _Bool multiline )
+{
+    if ( multiline )
+    {
+        g_context.multilineCommentStartLine = yylval;
+
+        int c;
+    	while ( ( c = input() ) != 0 )
+    	{
+    	    if ( c == '\n' )
+    	    {
+    	        ++yylval;
+    	    }
+
+    		if ( c == '*' )
+    		{
+    			while ( ( c = input() ) == '*' ) ;
+    			if ( c == '/' )
+    			{
+    			    onBlockDetected( MultiLineComment );
+                    g_context.multilineCommentEndLine = yylval;
+
+    			    return;
+    			}
+    			if ( c == 0 ) break;
+    		}
+    	}
+
+    	yyerror( "[ERROR] Unterminated comment\n" );
+    }
+    else
+    {
+        int cur, prev;
+        while ( ( cur = input() ) != 0 )
+        {
+    	    if ( cur == '\n' )
+    	    {
+    	        ++yylval;
+    	    }
+
+            if ( cur == '\n' && prev != '\\' )
+            {
+                onBlockDetected( OneLineComment );
+                return;
+            }
+            prev = cur;
+        }
+
+    	yyerror( "Unterminated comment\n" );
+    }
+}

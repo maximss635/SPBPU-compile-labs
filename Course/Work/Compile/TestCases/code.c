@@ -1,5 +1,10 @@
 void empty(){}
-
+/*
+ * sda
+ * asd
+ * asda
+ * sdsad
+ * */
 int instancesDeclarations( int a )
 {
     static char A = 1, B = 2, C = 3, D = 4 ;
@@ -10,7 +15,17 @@ int instancesDeclarations( int a )
     return a;
 }
 
+/*
+ * asdasdasdasd
+ *  dsad asd
+ * sadasdasdasdasdasd
+ * */
+
+
 inline int foo( int t ) { return ++t; }
+
+// asdasdasdasdasdasdasdsa
+
 
 void longExpr()
 {
@@ -20,9 +35,15 @@ void longExpr()
     return a + b * c << d / (a + 11 + 2 + (b+c));
 }
 
+//sd asd asd asdsadasdasdas
+
 void calls()
 {
     int p;
+
+    // asdasdasdas d\
+    sadsadasdds \
+    sadasdasddasd
 
     calls();
     calls( p );

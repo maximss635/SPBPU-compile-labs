@@ -69,7 +69,8 @@
 /* First part of user prologue.  */
 #line 1 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
 
-#include "detected_callbacks.h"
+#include "logging.h"
+#include "context.h"
 
 void yyerror( char* s ) ;
 int yylex();
@@ -77,20 +78,17 @@ int yylex();
 extern FILE* yyin;
 extern char *yytext;
 
-int numError = 0;
-char curLine[ 128 ] = "";
-char prevLine[ 128 ] = "";
-char someName[ 128 ] = "";
-char someFunctionName[ 128 ] = "";
+struct Context g_context;   // Singleton
+int numError;
 
 void saveFuncName()
 {
-    strcpy( someFunctionName, someName );
-    LOG_DEBUG_FMT( "Start parsing function: %s", someFunctionName );
+    strcpy( g_context.someFunctionName, g_context.someName );
+    LOG_DEBUG_FMT( "Start parsing function: %s", g_context.someFunctionName );
 }
 
 
-#line 94 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 92 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -584,18 +582,18 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    37,    37,    38,    41,    52,    52,    60,    63,    63,
-      66,    66,    66,    69,    73,    73,    73,    76,    76,    76,
-      79,    84,    85,    86,    87,    90,    90,    90,    90,    91,
-      92,    93,    94,   100,   101,   104,   105,   106,   107,   108,
-     109,   110,   110,   114,   115,   118,   118,   122,   125,   125,
-     129,   130,   133,   133,   133,   136,   141,   144,   148,   148,
-     148,   151,   152,   155,   160,   163,   168,   170,   167,   173,
-     175,   172,   180,   179,   183,   182,   186,   189,   192,   192,
-     192,   195,   195,   196,   196,   197,   198,   199,   200,   203,
-     206,   206,   206,   209,   209,   209,   212,   212,   212,   215,
-     215,   215,   218,   218,   218,   221,   221,   224,   227,   227,
-     230
+       0,    35,    35,    36,    39,    50,    50,    58,    61,    61,
+      64,    64,    64,    67,    71,    71,    71,    74,    74,    74,
+      77,    82,    83,    84,    85,    88,    88,    88,    88,    89,
+      90,    91,    92,    98,    99,   102,   103,   104,   105,   106,
+     107,   108,   108,   112,   113,   116,   116,   120,   123,   123,
+     127,   128,   131,   131,   131,   134,   139,   142,   146,   146,
+     146,   149,   150,   153,   158,   161,   166,   168,   165,   171,
+     173,   170,   178,   177,   181,   180,   184,   187,   190,   190,
+     190,   193,   193,   194,   194,   195,   196,   197,   198,   201,
+     204,   204,   204,   207,   207,   207,   210,   210,   210,   213,
+     213,   213,   216,   216,   216,   219,   219,   222,   225,   225,
+     228
 };
 #endif
 
@@ -1320,73 +1318,73 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* $@2: %empty  */
-#line 52 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 50 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
                                 { saveFuncName(); }
-#line 1326 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1324 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 6: /* c_function_definition: ret_value SOME_NAME '(' $@2 function_params ')' '{' function_entries '}'  */
-#line 57 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 55 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
         { onBlockDetected( FunctionDefinition ); }
-#line 1332 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1330 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 50: /* c_decl_var_equal_number: var_or_array '=' assign_right_expr  */
-#line 129 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 127 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
                                        { onBlockDetected( LocalInstanceDeclaration ); }
-#line 1338 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1336 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 51: /* c_decl_var_equal_number: var_or_array  */
-#line 130 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 128 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
                    { onBlockDetected( LocalInstanceDeclaration ); }
-#line 1344 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1342 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 66: /* $@3: %empty  */
-#line 168 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 166 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
     { onBlockDetected( IfCond ); }
-#line 1350 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1348 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 67: /* $@4: %empty  */
-#line 170 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 168 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
         { onBlockDetected( IfBody ); }
-#line 1356 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1354 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 69: /* $@5: %empty  */
-#line 173 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 171 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
     { onBlockDetected( IfCond ); }
-#line 1362 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1360 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 70: /* $@6: %empty  */
-#line 175 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 173 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
     { onBlockDetected( IfBody ); }
-#line 1368 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1366 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 72: /* $@7: %empty  */
-#line 180 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 178 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
         { onBlockDetected( ElseCond ); }
-#line 1374 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1372 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 74: /* $@8: %empty  */
-#line 183 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 181 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
     { onBlockDetected( ElseCond ); }
-#line 1380 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1378 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
   case 75: /* else_cases: ELSE $@8 function_entrie  */
-#line 185 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 183 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
     { onBlockDetected( ElseBody ); }
-#line 1386 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1384 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
     break;
 
 
-#line 1390 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
+#line 1388 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/grammar.tab.c"
 
       default: break;
     }
@@ -1580,7 +1578,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 232 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
+#line 230 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/grammar.y"
 
 
 void yyerror( char* s )
@@ -1589,13 +1587,13 @@ void yyerror( char* s )
 
     fprintf( stderr, "[ERROR] %s\n", s );
     fprintf( stderr, "          Line number: %d\n", yylval + 1 );
-    fprintf( stderr, "          Current line: \"%s\"\n", curLine );
-    fprintf( stderr, "          Previous line: \"%s\"\n", prevLine );
+    fprintf( stderr, "          Current line: \"%s\"\n", g_context.curLine );
+    fprintf( stderr, "          Previous line: \"%s\"\n", g_context.prevLine );
 }
 
 int yywrap()
 {
-    if (0 == numError)
+    if ( 0 == numError )
         printf("OK\n");
     return 1;
 }

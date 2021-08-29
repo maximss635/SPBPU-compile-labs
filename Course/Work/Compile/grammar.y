@@ -1,5 +1,6 @@
 %{
-#include "detected_callbacks.h"
+#include "logging.h"
+#include "context.h"
 
 void yyerror( char* s ) ;
 int yylex();
@@ -7,16 +8,13 @@ int yylex();
 extern FILE* yyin;
 extern char *yytext;
 
-int numError = 0;
-char curLine[ 128 ] = "";
-char prevLine[ 128 ] = "";
-char someName[ 128 ] = "";
-char someFunctionName[ 128 ] = "";
+struct Context g_context;   // Singleton
+int numError;
 
 void saveFuncName()
 {
-    strcpy( someFunctionName, someName );
-    LOG_DEBUG_FMT( "Start parsing function: %s", someFunctionName );
+    strcpy( g_context.someFunctionName, g_context.someName );
+    LOG_DEBUG_FMT( "Start parsing function: %s", g_context.someFunctionName );
 }
 
 %}
@@ -237,13 +235,13 @@ void yyerror( char* s )
 
     fprintf( stderr, "[ERROR] %s\n", s );
     fprintf( stderr, "          Line number: %d\n", yylval + 1 );
-    fprintf( stderr, "          Current line: \"%s\"\n", curLine );
-    fprintf( stderr, "          Previous line: \"%s\"\n", prevLine );
+    fprintf( stderr, "          Current line: \"%s\"\n", g_context.curLine );
+    fprintf( stderr, "          Previous line: \"%s\"\n", g_context.prevLine );
 }
 
 int yywrap()
 {
-    if (0 == numError)
+    if ( 0 == numError )
         printf("OK\n");
     return 1;
 }

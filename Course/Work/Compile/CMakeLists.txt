@@ -11,7 +11,7 @@ IF(BISON_FOUND)
     add_custom_command(
             OUTPUT ${BisonOutput}
             COMMAND ${BISON_EXECUTABLE}
-            -o ${CMAKE_SOURCE_DIR}/gen/grammar.tab.c -d --verbose
+            -o ${CMAKE_SOURCE_DIR}/gen/grammar.tab.c -d
             ${CMAKE_SOURCE_DIR}/grammar.y
             COMMENT "Generating grammar.tab.c/grammar.tab.h"
     )
@@ -30,8 +30,9 @@ IF(FLEX_FOUND)
 ENDIF()
 
 set( SOURCE
-        detected_callbacks.c
+        ${FlexOutput}
         ${BisonOutput}
-        ${FlexOutput})
+        logging.c
+        )
 
 add_executable(Compile ${SOURCE} )

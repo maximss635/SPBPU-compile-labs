@@ -352,8 +352,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 39
-#define YY_END_OF_BUFFER 40
+#define YY_NUM_RULES 41
+#define YY_END_OF_BUFFER 42
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -361,21 +361,21 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[117] =
+static const flex_int16_t yy_accept[120] =
     {   0,
-       37,   37,   40,   39,   13,   14,   39,   39,   34,   34,
-       21,   22,   31,   31,   15,   31,   37,   18,   16,   32,
-       33,   32,   17,   38,   23,   24,   38,   38,   38,   37,
-       38,   38,   38,   38,   38,   38,   38,   19,   34,   20,
-       13,   14,   32,   34,   36,   37,   37,   35,   38,   38,
-       38,   27,   38,   38,   38,   38,   25,   38,   38,   38,
-       38,   38,   38,   38,   38,   34,   38,   38,   38,   38,
-       38,   38,   29,   38,    1,   38,   38,   38,   38,   38,
-       38,   38,    4,   38,   38,   26,   38,   38,   38,    5,
-       38,   38,   38,   38,    8,   38,   11,   38,   38,    3,
+       39,   39,   42,   41,   15,   16,   41,   41,   36,   36,
+       23,   24,   33,   33,   17,   33,   39,   33,   20,   18,
+       34,   35,   34,   19,   40,   25,   26,   40,   40,   40,
+       39,   40,   40,   40,   40,   40,   40,   40,   21,   36,
+       22,   15,   16,   34,   36,   38,   39,   39,    1,    2,
+       37,   40,   40,   40,   29,   40,   40,   40,   40,   27,
+       40,   40,   40,   40,   40,   40,   40,   40,   36,   40,
+       40,   40,   40,   40,   40,   31,   40,    3,   40,   40,
+       40,   40,   40,   40,   40,    6,   40,   40,   28,   40,
+       40,   40,    7,   40,   40,   40,   40,   10,   40,   13,
 
-       38,   38,   38,   38,   38,   28,    2,   10,   12,   30,
-        7,    9,   38,   38,    6,    0
+       40,   40,    5,   40,   40,   40,   40,   40,   30,    4,
+       12,   14,   32,    9,   11,   40,   40,    8,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -419,89 +419,89 @@ static const YY_CHAR yy_meta[50] =
         2,    2,    2,    2,    2,    2,    1,    2,    1
     } ;
 
-static const flex_int16_t yy_base[118] =
+static const flex_int16_t yy_base[121] =
     {   0,
-        0,    0,  144,  145,  141,  145,  139,  121,  145,  133,
-      145,  145,  145,  128,  145,  125,   36,  145,  145,   34,
-      117,   35,  145,    0,  145,  145,   22,   97,   14,   25,
-       25,   96,  102,   23,   95,   93,   96,  145,   52,  145,
-      128,  145,  145,  145,  145,   56,  145,  145,    0,  101,
-       90,   84,   85,   83,   85,   83,    0,   34,   84,   79,
-       86,   91,   77,   81,   80,   59,   75,   73,   84,   80,
-       79,   82,    0,   73,    0,   74,   63,   67,   61,   66,
-       70,   62,    0,   56,   60,    0,   56,   53,   56,    0,
-       53,   59,   54,   54,    0,   55,    0,   54,   45,    0,
+        0,    0,  146,  147,  143,  147,  141,  123,  147,  135,
+      147,  147,  147,  130,  147,  127,   36,   41,  147,  147,
+       34,  119,   37,  147,    0,  147,  147,   20,   99,   24,
+       23,   30,   98,  104,   29,   97,   95,   98,  147,   50,
+      147,  130,  147,  147,  147,  147,   58,  147,  147,  147,
+      147,    0,  103,   92,   86,   87,   85,   87,   85,    0,
+       36,   86,   81,   88,   93,   79,   83,   82,   61,   77,
+       75,   86,   82,   81,   84,    0,   75,    0,   76,   65,
+       69,   63,   68,   72,   65,    0,   59,   63,    0,   59,
+       55,   58,    0,   55,   61,   56,   56,    0,   57,    0,
 
-       50,   43,   49,   49,   40,    0,    0,    0,    0,    0,
-        0,    0,   45,   43,    0,  145,   65
+       56,   49,    0,   54,   47,   51,   51,   42,    0,    0,
+        0,    0,    0,    0,    0,   47,   45,    0,  147,   65
     } ;
 
-static const flex_int16_t yy_def[118] =
+static const flex_int16_t yy_def[121] =
     {   0,
-      116,    1,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  117,  116,  116,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,  117,  117,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  117,  117,
-      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,  116,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
+      119,    1,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  120,  119,  119,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  119,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
 
-      117,  117,  117,  117,  117,  117,  117,  117,  117,  117,
-      117,  117,  117,  117,  117,    0,  116
+      120,  120,  120,  120,  120,  120,  120,  120,  120,  120,
+      120,  120,  120,  120,  120,  120,  120,  120,    0,  119
     } ;
 
-static const flex_int16_t yy_nxt[195] =
+static const flex_int16_t yy_nxt[197] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
-       14,   15,   16,   17,   13,   17,   18,   19,   20,   21,
-       22,   23,   24,   25,   26,    9,    4,   24,   24,   27,
-       28,   29,   30,   24,   24,   31,   32,   24,   24,   33,
-       34,   24,   35,   36,   37,   24,   38,   39,   40,   46,
-       53,   46,   48,   43,   43,   48,   50,   57,   61,   54,
-       51,   55,   58,   56,   62,   46,   49,   46,   47,   46,
-       74,   46,   46,  115,   46,   75,  114,  113,  112,  111,
-      110,  109,  108,   46,   47,  107,  106,  105,   47,  104,
-      103,   47,  102,  101,  100,   99,   98,   97,   96,   66,
+       14,   15,   16,   17,   18,   17,   19,   20,   21,   22,
+       23,   24,   25,   26,   27,    9,    4,   25,   25,   28,
+       29,   30,   31,   25,   25,   32,   33,   25,   25,   34,
+       35,   25,   36,   37,   38,   25,   39,   40,   41,   47,
+       49,   47,   51,   44,   53,   50,   44,   51,   54,   58,
+       56,   59,   60,   47,   64,   47,   52,   61,   48,   57,
+       65,   47,   77,   47,   47,  118,   47,   78,  117,  116,
+      115,  114,   48,   47,  113,  112,  111,  110,  109,  108,
+       48,  107,  106,   48,  105,  104,  103,   69,  102,  101,
 
-       95,   94,   93,   46,   92,   91,   46,   90,   89,   88,
-       87,   86,   85,   84,   83,   82,   81,   80,   79,   78,
-       77,   76,   73,   72,   71,   70,   69,   68,   67,   41,
-       65,   64,   63,   60,   59,   52,   43,   45,   45,   44,
-       43,   42,   41,  116,    3,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116
+      100,   99,   98,   97,   96,   47,   95,   94,   47,   93,
+       92,   91,   90,   89,   88,   87,   86,   85,   84,   83,
+       82,   81,   80,   79,   76,   75,   74,   73,   72,   71,
+       70,   42,   68,   67,   66,   63,   62,   55,   44,   46,
+       46,   45,   44,   43,   42,  119,    3,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119
 
     } ;
 
-static const flex_int16_t yy_chk[195] =
+static const flex_int16_t yy_chk[197] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,   17,
-       29,   17,   20,   20,   22,   22,   27,   31,   34,   29,
-       27,   30,   31,   30,   34,   39,  117,   39,   17,   46,
-       58,   46,   66,  114,   66,   58,  113,  105,  104,  103,
-      102,  101,   99,   17,   39,   98,   96,   94,   46,   93,
-       92,   66,   91,   89,   88,   87,   85,   84,   82,   39,
+       18,   17,   21,   21,   28,   18,   23,   23,   28,   31,
+       30,   31,   32,   40,   35,   40,  120,   32,   17,   30,
+       35,   47,   61,   47,   69,  117,   69,   61,  116,  108,
+      107,  106,   40,   17,  105,  104,  102,  101,   99,   97,
+       47,   96,   95,   69,   94,   92,   91,   40,   90,   88,
 
-       81,   80,   79,   46,   78,   77,   66,   76,   74,   72,
-       71,   70,   69,   68,   67,   65,   64,   63,   62,   61,
-       60,   59,   56,   55,   54,   53,   52,   51,   50,   41,
-       37,   36,   35,   33,   32,   28,   21,   16,   14,   10,
-        8,    7,    5,    3,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116,  116,  116,  116,  116,  116,  116,
-      116,  116,  116,  116
+       87,   85,   84,   83,   82,   47,   81,   80,   69,   79,
+       77,   75,   74,   73,   72,   71,   70,   68,   67,   66,
+       65,   64,   63,   62,   59,   58,   57,   56,   55,   54,
+       53,   42,   38,   37,   36,   34,   33,   29,   22,   16,
+       14,   10,    8,    7,    5,    3,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119,  119,  119,  119,  119,
+      119,  119,  119,  119,  119,  119
 
     } ;
 
@@ -525,14 +525,21 @@ char *yytext;
 #include <string.h>
 
 #include "grammar.tab.h"
-#include "detected_callbacks.h"
+#include "logging.h"
+#include "context.h"
 
 #define NEW_TOKEN( token ) \
     onTokenDetected( Default ); \
     return token;
 
-#line 534 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
-#line 535 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+extern void yyerror( char* );
+
+extern Context g_context;
+
+void readComment( _Bool multiline );
+
+#line 541 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+#line 542 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
 
 #define INITIAL 0
 
@@ -749,9 +756,10 @@ YY_DECL
 		}
 
 	{
-#line 14 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 21 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 
-#line 754 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+
+#line 762 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -778,13 +786,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 117 )
+				if ( yy_current_state >= 120 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 145 );
+		while ( yy_base[yy_current_state] != 147 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -810,201 +818,211 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 15 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_INT );
+#line 23 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+readComment( 1 );
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 16 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_FLOAT );
+#line 24 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+readComment( 0 );
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 17 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_DOUBLE );
+#line 26 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_INT );
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 18 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_CHAR );
+#line 27 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_FLOAT );
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 19 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_PREFIX_LONG );
+#line 28 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_DOUBLE );
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 20 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_PREFIX_UNSIGNED );
+#line 29 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_CHAR );
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 21 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_PREFIX_SIGNED );
+#line 30 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_PREFIX_LONG );
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 22 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_VOID );
+#line 31 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_PREFIX_UNSIGNED );
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 23 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_PREFIX_STATIC );
+#line 32 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_PREFIX_SIGNED );
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 24 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_PREFIX_EXTERN );
+#line 33 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_VOID );
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 25 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( TYPE_PREFIX_CONST );
+#line 34 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_PREFIX_STATIC );
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 26 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( INLINE );
+#line 35 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_PREFIX_EXTERN );
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 28 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-onTokenDetected( Default );
+#line 36 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( TYPE_PREFIX_CONST );
 	YY_BREAK
 case 14:
-/* rule 14 can match eol */
 YY_RULE_SETUP
-#line 30 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-onTokenDetected( Enter ); yylval++;
+#line 37 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( INLINE );
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 32 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( ',' );
+#line 39 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+onTokenDetected( Default );
 	YY_BREAK
 case 16:
+/* rule 16 can match eol */
 YY_RULE_SETUP
-#line 33 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( ';' );
+#line 41 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+onTokenDetected( Enter ); yylval++;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 34 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( '?' );
+#line 43 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( ',' );
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 35 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( ':' );
+#line 44 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( ';' );
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 37 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( '{' );
+#line 45 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( '?' );
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 38 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( '}' );
+#line 46 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( ':' );
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 39 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( '(' );
+#line 48 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( '{' );
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 40 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( ')' );
+#line 49 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( '}' );
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 41 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( '[' );
+#line 50 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( '(' );
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 42 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( ']' );
+#line 51 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( ')' );
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 44 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( IF );
+#line 52 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( '[' );
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 45 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( ELSE );
+#line 53 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( ']' );
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 46 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( DO );
+#line 55 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( IF );
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 47 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( WHILE );
+#line 56 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( ELSE );
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 48 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( FOR );
+#line 57 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( DO );
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 49 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( RETURN );
+#line 58 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( WHILE );
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 51 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( BINARY_OPERATOR );
+#line 59 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( FOR );
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 52 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( BINARY_OPERATOR );
+#line 60 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( RETURN );
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 53 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( '=' );
+#line 62 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 54 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 63 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 55 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( BINARY_OPERATOR );
+#line 64 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( '=' );
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 57 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( UNARY_OPERATOR );
+#line 65 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 59 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-NEW_TOKEN( NUMBER );
+#line 66 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( BINARY_OPERATOR );
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 61 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
-onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
+#line 68 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( UNARY_OPERATOR );
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 63 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 70 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+NEW_TOKEN( NUMBER );
+	YY_BREAK
+case 40:
+YY_RULE_SETUP
+#line 72 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
+	YY_BREAK
+case 41:
+YY_RULE_SETUP
+#line 74 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 ECHO;
 	YY_BREAK
-#line 1007 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
+#line 1025 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/gen/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1301,7 +1319,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 117 )
+			if ( yy_current_state >= 120 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1329,11 +1347,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 117 )
+		if ( yy_current_state >= 120 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 116);
+	yy_is_jam = (yy_current_state == 119);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -2009,6 +2027,59 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 63 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
+#line 74 "/home/maxim/IBKS/3 year/6 semester/ФГиТК/Course/Work/Compile/lexic.l"
 
+
+
+void readComment( _Bool multiline )
+{
+    if ( multiline )
+    {
+        g_context.multilineCommentStartLine = yylval;
+
+        int c;
+    	while ( ( c = input() ) != 0 )
+    	{
+    	    if ( c == '\n' )
+    	    {
+    	        ++yylval;
+    	    }
+
+    		if ( c == '*' )
+    		{
+    			while ( ( c = input() ) == '*' ) ;
+    			if ( c == '/' )
+    			{
+    			    onBlockDetected( MultiLineComment );
+                    g_context.multilineCommentEndLine = yylval;
+
+    			    return;
+    			}
+    			if ( c == 0 ) break;
+    		}
+    	}
+
+    	yyerror( "[ERROR] Unterminated comment\n" );
+    }
+    else
+    {
+        int cur, prev;
+        while ( ( cur = input() ) != 0 )
+        {
+    	    if ( cur == '\n' )
+    	    {
+    	        ++yylval;
+    	    }
+
+            if ( cur == '\n' && prev != '\\' )
+            {
+                onBlockDetected( OneLineComment );
+                return;
+            }
+            prev = cur;
+        }
+
+    	yyerror( "Unterminated comment\n" );
+    }
+}
 
