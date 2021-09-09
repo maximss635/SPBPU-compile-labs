@@ -50,7 +50,7 @@ size_t                          NEW_TOKEN( TYPE_SIZE_T );
 
 (\r\n)|\n                       onTokenDetected( Enter ); yylval++;
 
-\"                              readStringConstant();
+\"                              readStringConstant(); NEW_TOKEN( STRING_CONSTANT );
 
 "."                             NEW_TOKEN( '.' );
 ","                             NEW_TOKEN( ',' );
@@ -67,6 +67,8 @@ size_t                          NEW_TOKEN( TYPE_SIZE_T );
 \]                              NEW_TOKEN( ']' );
 
 struct                          NEW_TOKEN( STRUCT );
+
+sizeof                          NEW_TOKEN( SIZEOF );
 
 if                              NEW_TOKEN( IF );
 else                            NEW_TOKEN( ELSE );

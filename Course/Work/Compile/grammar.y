@@ -15,7 +15,7 @@ int numError;
 void saveFuncName()
 {
     strcpy( g_context.someFunctionName, g_context.someName );
-    LOG_DEBUG_FMT( "Start parsing function: %s", g_context.someFunctionName );
+    //LOG_DEBUG_FMT( "Start parsing function: %s", g_context.someFunctionName );
 }
 
 %}
@@ -32,7 +32,7 @@ void saveFuncName()
 %token NUMBER SOME_NAME
 %token BINARY_OPERATOR UNARY_OPERATOR
 
-%token BREAK CONTINUE
+%token BREAK CONTINUE SIZEOF STRING_CONSTANT
 
 %token STRUCT
 
@@ -67,7 +67,10 @@ c_function_call:
     SOME_NAME '(' instances_to_stack ')';		// foo( a, b, 2 )
 
 ret_value:
-	c_type | INLINE c_type;
+    __ret_value | INLINE __ret_value;
+
+__ret_value:
+	c_type '*' | c_type;
 
 function_params:
     TYPE_VOID | __function_params;
@@ -76,7 +79,8 @@ __function_params:
 	function_param ',' function_params | function_param | /* nothing */;		// int a, double b, char c
 
 function_param:
-	c_type SOME_NAME;		// int t;
+	c_type SOME_NAME |		        // int t;
+	c_type '*' SOME_NAME ;          // int * t
 					// TODO: struct, union, enum, pointers
 
 instances_to_stack:
@@ -86,7 +90,7 @@ instance_to_stack:
 	__instance_to_stack | c_expr;
 
 __instance_to_stack:
-    var_or_array | NUMBER | field;
+    var_or_array | NUMBER | field | STRING_CONSTANT;
 
 instance_name:
 	SOME_NAME;
@@ -106,10 +110,6 @@ __type_prefix:
     __type_prefix_const;
 
 __c_type:
-    ___c_type '*' |         // pointers
-    ___c_type;
-
-___c_type:
     TYPE_LONG_INT |
     TYPE_LONG_DOUBLE |
     TYPE_LONG |
@@ -150,8 +150,16 @@ function_entry:
 	c_local_instance_declaration ';' | 	                // int t;
 	return_line ';' |			                        // return a + b * c;
 	BREAK ';' | CONTINUE ';' |
+	c_lang_operator ';' |
 	c_expr ';' |                                        // ...
     /* empty */ ;
+
+c_lang_operator:
+    operator_sizeof;
+
+operator_sizeof:
+    SIZEOF '(' c_type ')' |
+    SIZEOF '(' SOME_NAME ')' ;
 
 return_line:
 	RETURN var_or_number |
@@ -170,8 +178,12 @@ __c_instances_declarations_in_common:
         //  a = 1, b = 2, c = 4;
 
 __c_decl_var_equal_number:
-    var_or_array '=' assign_right_expr { onBlockDetected( LocalInstanceDeclaration ); }
-    | var_or_array { onBlockDetected( LocalInstanceDeclaration ); };
+    '*' ___c_decl_var_equal_number |            // pointers declare
+    ___c_decl_var_equal_number;
+
+___c_decl_var_equal_number:
+    var_or_array '=' assign_right_expr { onBlockDetected( LocalInstanceDeclaration ); } |
+    var_or_array { onBlockDetected( LocalInstanceDeclaration ); };
 
 var_or_array:
     array_item |
@@ -197,8 +209,15 @@ cond_in_brackets:
     c_expr;
 
 cond_in_brackets_for:
-    c_expr ';' c_expr ';' c_expr |                                      // ( ... ; ... ; ... )
-    c_local_instance_declaration ';' c_expr ';' c_expr ;                // ( double ... ; ... ; ... )
+    cond_in_brackets_for_enrty ';'
+    cond_in_brackets_for_enrty ';'
+    cond_in_brackets_for_enrty |              // ( ... ; ... ; ... )
+    c_local_instance_declaration ';'
+    cond_in_brackets_for_enrty ';'
+    cond_in_brackets_for_enrty ;      // ( double ... ; ... ; ... )
+
+cond_in_brackets_for_enrty:
+    c_expr | /* noth */ ;
 
 body:
 	'{'											                                    // {
@@ -238,7 +257,11 @@ body_entries:
     function_entries;
 
 assign_right_expr:
-    c_expr | var_or_number | array_item | field;
+    c_expr |
+    var_or_number |
+    array_item |
+    field |
+    c_lang_operator;
 
 c_expr:
     __left_operand binary_operator __right_operand |
@@ -255,19 +278,19 @@ tern_operator:
     __operand1 '?' __operand2 ':' __operand3 ;
 
 __operand1:
-    array_item | var_or_number | field | c_expr;
+    array_item | var_or_number | field | c_expr| c_lang_operator;
 
 __operand2:
-    array_item | var_or_number | field | c_expr;
+    array_item | var_or_number | field | c_expr| c_lang_operator;
 
 __operand3:
-    array_item | var_or_number | field | c_expr;
+    array_item | var_or_number | field | c_expr| c_lang_operator;
 
 __left_operand:
     array_item | var_or_number | field | __c_expr;
 
 __right_operand:
-    array_item | var_or_number | field | c_expr;
+    array_item | var_or_number | field | c_expr | c_lang_operator;
 
 field:
     SOME_NAME __field;
@@ -277,10 +300,13 @@ __field:
     ARR SOME_NAME __field | ARR SOME_NAME ;
 
 unary_operator:
-    UNARY_OPERATOR | '*' | '&';
+    UNARY_OPERATOR | '*' | '&' | cast;
 
 binary_operator:
     BINARY_OPERATOR | '=' | '*' | '&';
+
+cast:
+    '(' c_type ')' ;
 
 __c_expr_in_brackets:
     '(' c_expr ')';

@@ -8,7 +8,7 @@ int ternOperator( int t );
 
 void sample()
 {
-    int *p1, *p2, *p3;
+    foo ( (int)a );
 }
 
 void empty(){}
