@@ -66,12 +66,17 @@ size_t                          NEW_TOKEN( TYPE_SIZE_T );
 \[                              NEW_TOKEN( '[' );
 \]                              NEW_TOKEN( ']' );
 
+struct                          NEW_TOKEN( STRUCT );
+
 if                              NEW_TOKEN( IF );
 else                            NEW_TOKEN( ELSE );
 do                              NEW_TOKEN( DO );
 while                           NEW_TOKEN( WHILE );
 for                             NEW_TOKEN( FOR );
 return                          NEW_TOKEN( RETURN );
+
+break                           NEW_TOKEN( BREAK );
+continue                        NEW_TOKEN( CONTINUE );
 
 "*"                             NEW_TOKEN( '*' );
 "&"                             NEW_TOKEN( '&' );

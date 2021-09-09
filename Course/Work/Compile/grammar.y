@@ -32,6 +32,10 @@ void saveFuncName()
 %token NUMBER SOME_NAME
 %token BINARY_OPERATOR UNARY_OPERATOR
 
+%token BREAK CONTINUE
+
+%token STRUCT
+
 %%
 c_entries:
 	c_entry c_entries |
@@ -120,6 +124,7 @@ ___c_type:
 	__custom_type;
 
 __custom_type:
+    STRUCT SOME_NAME |
     SOME_NAME;
 
 __type_prefix_static_extern:
@@ -144,6 +149,7 @@ function_entry:
 	cycle_do_while |		                            // do { ... } while ( ... ) ;
 	c_local_instance_declaration ';' | 	                // int t;
 	return_line ';' |			                        // return a + b * c;
+	BREAK ';' | CONTINUE ';' |
 	c_expr ';' |                                        // ...
     /* empty */ ;
 
@@ -168,8 +174,7 @@ __c_decl_var_equal_number:
     | var_or_array { onBlockDetected( LocalInstanceDeclaration ); };
 
 var_or_array:
-    SOME_NAME '[' NUMBER ']' |
-    SOME_NAME '[' SOME_NAME ']' |
+    array_item |
     var_name;
 
 cycle_do_while:
@@ -185,7 +190,11 @@ cycle_while:
 	function_entry;                                                                //     ...
 
 cond_in_brackets:
-    NUMBER | instance_name | field | c_expr;
+    NUMBER |
+    instance_name |
+    field |
+    array_item |
+    c_expr;
 
 cond_in_brackets_for:
     c_expr ';' c_expr ';' c_expr |                                      // ( ... ; ... ; ... )
@@ -277,8 +286,11 @@ __c_expr_in_brackets:
     '(' c_expr ')';
 
 array_item:
-    var_name '[' SOME_NAME ']' |
-    var_name '[' NUMBER ']';
+    var_name '[' array_index ']' |
+    field '[' array_index ']' ;
+
+array_index:
+    NUMBER | var_or_array | field;
 
 var_name:
     SOME_NAME;
