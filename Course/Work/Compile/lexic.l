@@ -27,11 +27,16 @@ void readPreprocessorLine();
 
 "#"                             readPreprocessorLine();
 
+"long int"                      NEW_TOKEN( TYPE_LONG_INT );
+"long double"                   NEW_TOKEN( TYPE_LONG_DOUBLE );
+"short int"                     NEW_TOKEN( TYPE_SHORT_INT );
+long                            NEW_TOKEN( TYPE_LONG );
+short                           NEW_TOKEN( TYPE_SHORT );
+
 int                             NEW_TOKEN( TYPE_INT );
 double                          NEW_TOKEN( TYPE_FLOAT );
 float                           NEW_TOKEN( TYPE_DOUBLE );
 char                            NEW_TOKEN( TYPE_CHAR );
-long                            NEW_TOKEN( TYPE_PREFIX_LONG );
 unsigned                        NEW_TOKEN( TYPE_PREFIX_UNSIGNED );
 signed                          NEW_TOKEN( TYPE_PREFIX_SIGNED );
 void                            NEW_TOKEN( TYPE_VOID );
@@ -68,10 +73,13 @@ while                           NEW_TOKEN( WHILE );
 for                             NEW_TOKEN( FOR );
 return                          NEW_TOKEN( RETURN );
 
-\+|\-|\*|\/                     NEW_TOKEN( BINARY_OPERATOR );
+"*"                             NEW_TOKEN( '*' );
+"&"                             NEW_TOKEN( '&' );
+\+|\-|\/                        NEW_TOKEN( BINARY_OPERATOR );
+\+=|\-=|\*\|\/=|\|=|\&=|\^=     NEW_TOKEN( BINARY_OPERATOR );
 ==|!=|\>|\>=|<|<=               NEW_TOKEN( BINARY_OPERATOR );
 =                               NEW_TOKEN( '=' );
-\||\|\||&|&&|\%|\^              NEW_TOKEN( BINARY_OPERATOR );
+\||\|\||&&|\%|\^                NEW_TOKEN( BINARY_OPERATOR );
 \<\<|>>                         NEW_TOKEN( BINARY_OPERATOR );
 
 \+\+|\-\-|!                     NEW_TOKEN( UNARY_OPERATOR );

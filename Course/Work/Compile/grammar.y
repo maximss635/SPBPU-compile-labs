@@ -25,6 +25,7 @@ void saveFuncName()
 /* TYPES */
 %token TYPE_INT TYPE_FLOAT TYPE_DOUBLE TYPE_CHAR TYPE_SIZE_T TYPE_PREFIX_LONG ARR
 %token TYPE_PREFIX_UNSIGNED TYPE_PREFIX_SIGNED TYPE_VOID TYPE_PREFIX_STATIC TYPE_PREFIX_EXTERN TYPE_PREFIX_CONST
+%token TYPE_LONG_INT TYPE_LONG_DOUBLE TYPE_SHORT_INT TYPE_LONG TYPE_SHORT
 
 /* Special tokens */
 %token IF ELSE WHILE DO FOR RETURN INLINE
@@ -89,29 +90,54 @@ instance_name:
 /* ======== C-TYPES =========== */
 
 c_type:
-    __type_prefix_1 __type_prefix_2 __c_type;
+    __c_type |
+    __type_prefixes __c_type;
+
+__type_prefixes:
+    __type_prefixes __type_prefix | __type_prefix;
+
+__type_prefix:
+    __type_prefix_static_extern |
+    __type_prefix_signed_unsigned |
+    __type_prefix_const;
 
 __c_type:
+    ___c_type '*' |         // pointers
+    ___c_type;
+
+___c_type:
+    TYPE_LONG_INT |
+    TYPE_LONG_DOUBLE |
+    TYPE_LONG |
+    TYPE_SHORT |
+    TYPE_SHORT_INT |
    	TYPE_INT |
 	TYPE_DOUBLE |
 	TYPE_FLOAT |
 	TYPE_CHAR |
 	TYPE_SIZE_T |
-	TYPE_VOID ;
+	TYPE_VOID |
+	__custom_type;
 
-__type_prefix_1:
-    TYPE_PREFIX_EXTERN | TYPE_PREFIX_STATIC | ;
+__custom_type:
+    SOME_NAME;
 
-__type_prefix_2:
-    TYPE_PREFIX_CONST | ;
+__type_prefix_static_extern:
+    TYPE_PREFIX_STATIC | TYPE_PREFIX_EXTERN;
+
+__type_prefix_signed_unsigned:
+    TYPE_PREFIX_SIGNED | TYPE_PREFIX_UNSIGNED;
+
+__type_prefix_const:
+    TYPE_PREFIX_CONST;
 
 /* ========= MAIN C-Code ============ */
 
 function_entries:
-	function_entrie function_entries |
-	function_entrie ;
+	function_entry function_entries |
+	function_entry ;
 
-function_entrie:
+function_entry:
 	cycle_for |			                                // for ( ... ) { ... }
 	cycle_while | 			                            // while ( ... ) { ... }
 	c_conditional | 		                            // if ( ... ) { ... } else { ... }
@@ -123,7 +149,8 @@ function_entrie:
 
 return_line:
 	RETURN var_or_number |
-	RETURN c_expr;
+	RETURN c_expr |
+	RETURN;
 
 var_or_number:
     var_name | NUMBER ;
@@ -141,7 +168,9 @@ __c_decl_var_equal_number:
     | var_or_array { onBlockDetected( LocalInstanceDeclaration ); };
 
 var_or_array:
-    var_name '[' NUMBER ']' | var_name '[' var_name ']' | var_name;
+    SOME_NAME '[' NUMBER ']' |
+    SOME_NAME '[' SOME_NAME ']' |
+    var_name;
 
 cycle_do_while:
 	DO 											                                        // do
@@ -153,7 +182,7 @@ cycle_while:
 	body                                                                            //     { ... }
     |
 	WHILE '(' cond_in_brackets ')'			                                        // while ( ... )
-	function_entrie;                                                                //     ...
+	function_entry;                                                                //     ...
 
 cond_in_brackets:
     NUMBER | instance_name | field | c_expr;
@@ -172,7 +201,7 @@ cycle_for:
 	body                                                                            //     { ... }
 	|
 	FOR '(' cond_in_brackets_for ')'			                                    // for ( ... ; ... ; ... )
-	function_entrie;                                                                //     ...
+	function_entry;                                                                //     ...
 
 c_conditional:
 	IF '(' cond_in_brackets ')'                                             // if ( ... )
@@ -182,7 +211,7 @@ c_conditional:
     else_cases |
 	IF '(' cond_in_brackets ')'                                             // if ( ... )
     { onBlockDetected( IfCond ); }
-    function_entrie										                    // 	    ...
+    function_entry										                    // 	    ...
     { onBlockDetected( IfBody ); }
     else_cases;
 
@@ -192,7 +221,7 @@ else_cases:
 	body                                                                    //     {...}
 	| ELSE                                                                  // else
     { onBlockDetected( ElseCond ); }                                        //  ...
-    function_entrie
+    function_entry
     { onBlockDetected( ElseBody ); }
     | /* nothing */ ;
 
@@ -200,18 +229,18 @@ body_entries:
     function_entries;
 
 assign_right_expr:
-    c_expr | var_or_number;
+    c_expr | var_or_number | array_item | field;
 
 c_expr:
     __left_operand binary_operator __right_operand |
-    UNARY_OPERATOR __operand1 |
+    unary_operator __operand1 |
     __operand1 UNARY_OPERATOR |
     tern_operator |
     __c_expr;
 
 __c_expr:
     __c_expr_in_brackets |
-        c_function_call |
+        c_function_call ;
 
 tern_operator:
     __operand1 '?' __operand2 ':' __operand3 ;
@@ -238,15 +267,18 @@ __field:
     '.' SOME_NAME __field | '.' SOME_NAME |
     ARR SOME_NAME __field | ARR SOME_NAME ;
 
+unary_operator:
+    UNARY_OPERATOR | '*' | '&';
 
 binary_operator:
-    BINARY_OPERATOR | '=';
+    BINARY_OPERATOR | '=' | '*' | '&';
 
 __c_expr_in_brackets:
     '(' c_expr ')';
 
 array_item:
-    var_name '[' SOME_NAME ']' | var_name '[' NUMBER ']';
+    var_name '[' SOME_NAME ']' |
+    var_name '[' NUMBER ']';
 
 var_name:
     SOME_NAME;

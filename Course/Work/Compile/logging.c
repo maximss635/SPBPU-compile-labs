@@ -51,7 +51,7 @@ void onBlockDetected( enum BlockKind blockKind )
 
     case LocalInstanceDeclaration:
         LOG_DEBUG_FMT( "Local instance declaration detected in function \"%s\": %s",
-                       g_context.someFunctionName, g_context.someName )
+                       g_context.someFunctionName, g_context.varName )
         break;
 
     case OneLineComment:
@@ -65,7 +65,7 @@ void onBlockDetected( enum BlockKind blockKind )
 
     case StringConstant:
         LOG_DEBUG_FMT( "String constant detected at line %d: %s",
-                       g_context.stringConstant, yylval + 1 );
+                       yylval + 1, g_context.stringConstant );
         break;
 
     case IfCond:
