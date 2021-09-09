@@ -3,6 +3,7 @@
 
 extern Context g_context;
 extern int yylval;
+_Bool g_logging = 1;
 
 void onTokenDetected( enum TokenKind tokenKind )
 {
@@ -11,6 +12,9 @@ void onTokenDetected( enum TokenKind tokenKind )
         case Enter:
             strcpy( g_context.prevLine, g_context.curLine );  // clear
             strcpy( g_context.curLine, "" );
+
+            //LOG_DEBUG( "New line" );
+
             break;
 
         case Name:

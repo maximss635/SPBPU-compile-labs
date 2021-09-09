@@ -1,3 +1,11 @@
+void empty();
+int instancesDeclarations( int a );
+void longExpr();
+void calls();
+void conditions( int a, int b, int c, int d, int e, int g );
+void cycles();
+void ternOperator( int t );
+
 void empty(){}
 /*
  * sda
@@ -39,7 +47,11 @@ void longExpr()
 
 void calls()
 {
-    int p;
+    int p = 0;
+    int pp[ 10 ];
+
+    pp[ 0 ] = 1;
+    pp[ p ] = 1;
 
     // asdasdasdas d\
     sadsadasdds \
@@ -53,6 +65,9 @@ void calls()
     calls( calls( ) );
     calls( 1, p, p + p * p, p + 1, calls( p ) );
     calls( calls( calls( calls( p ) ), 1 + p ) );
+
+    calls( pp[ 1 ] );
+    calls( pp[ p ] );
 }
 
 

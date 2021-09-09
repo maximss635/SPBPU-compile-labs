@@ -16,6 +16,7 @@ extern Context g_context;
 
 void readComment( _Bool multiline );
 void readStringConstant();
+void readPreprocessorLine();
 
 %}
 
@@ -23,6 +24,8 @@ void readStringConstant();
 
 "/*"                            readComment( 1 );
 "//"                            readComment( 0 );
+
+"#"                             readPreprocessorLine();
 
 int                             NEW_TOKEN( TYPE_INT );
 double                          NEW_TOKEN( TYPE_FLOAT );
@@ -36,6 +39,7 @@ static                          NEW_TOKEN( TYPE_PREFIX_STATIC );
 extern                          NEW_TOKEN( TYPE_PREFIX_EXTERN );
 const                           NEW_TOKEN( TYPE_PREFIX_CONST );
 inline                          NEW_TOKEN( INLINE );
+size_t                          NEW_TOKEN( TYPE_SIZE_T );
 
 [ \t]+                          onTokenDetected( Default );
 
@@ -115,7 +119,7 @@ void readComment( _Bool multiline )
     		}
     	}
 
-    	yyerror( "[ERROR] Unterminated comment\n" );
+    	yyerror( "Unterminated comment\n" );
     }
     else
     {
@@ -166,4 +170,24 @@ void readStringConstant()
     }
 
     yyerror( "Unterminated string constant\n" );
+}
+
+void readPreprocessorLine()
+{
+    int c;
+
+    do
+    {
+        c = input();
+    } while ( c != '\n' && c != 0 );
+
+    if ( c == 0 )
+    {
+        yyerror( "Unterminated line\n" );
+    }
+    else
+    {
+        onTokenDetected( Enter );
+        yylval++;
+    }
 }
