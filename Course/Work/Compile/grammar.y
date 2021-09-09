@@ -32,8 +32,8 @@ void saveFuncName()
 %token NUMBER SOME_NAME
 %token BINARY_OPERATOR UNARY_OPERATOR
 
-%token BREAK CONTINUE SIZEOF STRING_CONSTANT
-
+%token BREAK CONTINUE SIZEOF STRING_CONSTANT CHAR_CONSTANT
+%token COVICHKA
 %token STRUCT
 
 %%
@@ -70,7 +70,7 @@ ret_value:
     __ret_value | INLINE __ret_value;
 
 __ret_value:
-	c_type '*' | c_type;
+	c_type stars | c_type;
 
 function_params:
     TYPE_VOID | __function_params;
@@ -80,8 +80,7 @@ __function_params:
 
 function_param:
 	c_type SOME_NAME |		        // int t;
-	c_type '*' SOME_NAME ;          // int * t
-					// TODO: struct, union, enum, pointers
+	c_type stars SOME_NAME ;          // int * t
 
 instances_to_stack:
 	instance_to_stack ',' instances_to_stack | instance_to_stack | /* nothing */ ;	// a, b, 2 + t
@@ -90,7 +89,11 @@ instance_to_stack:
 	__instance_to_stack | c_expr;
 
 __instance_to_stack:
-    var_or_array | NUMBER | field | STRING_CONSTANT;
+    var_or_array |
+    NUMBER |
+    c_lang_operator |
+    field |
+    STRING_CONSTANT ;
 
 instance_name:
 	SOME_NAME;
@@ -169,7 +172,9 @@ return_line:
 var_or_number:
     var_name | NUMBER ;
 
-/* TODO: "struct T t"; , "enum T t;" + pointers: "int * p;" */
+stars:
+    stars '*' | '*';
+
 c_local_instance_declaration:
     c_type __c_instances_declarations_in_common ;             // double ... , ... , ...
 
@@ -178,7 +183,7 @@ __c_instances_declarations_in_common:
         //  a = 1, b = 2, c = 4;
 
 __c_decl_var_equal_number:
-    '*' ___c_decl_var_equal_number |            // pointers declare
+    stars ___c_decl_var_equal_number |            // pointers declare
     ___c_decl_var_equal_number;
 
 ___c_decl_var_equal_number:
@@ -261,7 +266,8 @@ assign_right_expr:
     var_or_number |
     array_item |
     field |
-    c_lang_operator;
+    c_lang_operator |
+    CHAR_CONSTANT;
 
 c_expr:
     __left_operand binary_operator __right_operand |
@@ -290,7 +296,7 @@ __left_operand:
     array_item | var_or_number | field | __c_expr;
 
 __right_operand:
-    array_item | var_or_number | field | c_expr | c_lang_operator;
+    array_item | var_or_number | field | c_expr | c_lang_operator | CHAR_CONSTANT;
 
 field:
     SOME_NAME __field;
@@ -309,6 +315,7 @@ cast:
     '(' c_type ')' ;
 
 __c_expr_in_brackets:
+    '(' SOME_NAME ')' |
     '(' c_expr ')';
 
 array_item:

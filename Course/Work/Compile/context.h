@@ -7,6 +7,7 @@ typedef struct Context
     char someFunctionName[ 128 ];
 
     char stringConstant[ 1024 ];
+    char charConstant;
 
     int multilineCommentStartLine, multilineCommentEndLine;
 } Context;

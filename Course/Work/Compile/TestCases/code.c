@@ -8,7 +8,9 @@ int ternOperator( int t );
 
 void sample()
 {
-    foo ( (int)a );
+    a = -12;
+//    if (!a && foo(a, &b) != -1)
+//        a++;
 }
 
 void empty(){}
@@ -61,6 +63,9 @@ int* pointers( double* p2, int i, char* p3 )
 {
     *p2 = 1.2;
     foo( *p3 );
+
+
+    int************** aaaaaaa;
 
     int a;
     return &a;

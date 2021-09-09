@@ -17,6 +17,8 @@ extern Context g_context;
 void readComment( _Bool multiline );
 void readStringConstant();
 void readPreprocessorLine();
+void readCharConstant();
+
 
 %}
 
@@ -51,6 +53,7 @@ size_t                          NEW_TOKEN( TYPE_SIZE_T );
 (\r\n)|\n                       onTokenDetected( Enter ); yylval++;
 
 \"                              readStringConstant(); NEW_TOKEN( STRING_CONSTANT );
+"\'"                            readCharConstant(); NEW_TOKEN( CHAR_CONSTANT );
 
 "."                             NEW_TOKEN( '.' );
 ","                             NEW_TOKEN( ',' );
@@ -91,9 +94,10 @@ continue                        NEW_TOKEN( CONTINUE );
 
 \+\+|\-\-|!                     NEW_TOKEN( UNARY_OPERATOR );
 
+0x[0-9|a-f][0-9|a-f]            NEW_TOKEN( NUMBER );
 [0-9|.]*|[0-9|.]*f              NEW_TOKEN( NUMBER );
 
-[a-zA-Z|_][a-zA-Z0-9|_]*          onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
+[a-zA-Z|_][a-zA-Z0-9|_]*    onTokenDetected( Name ); NEW_TOKEN( SOME_NAME );
 
 %%
 
@@ -204,5 +208,27 @@ void readPreprocessorLine()
     {
         onTokenDetected( Enter );
         yylval++;
+    }
+}
+
+void readCharConstant()
+{
+    int c = input();
+    if ( c == '\\' )
+        c = input();
+
+    if ( c == 0 )
+    {
+        yyerror( "Unterminated char constant\n" );
+        return;
+    }
+
+    g_context.charConstant = ( char )c;
+
+    c = input();
+
+    if ( c == 0 || c != '\'' )
+    {
+        yyerror( "Unterminated string constant\n" );
     }
 }
