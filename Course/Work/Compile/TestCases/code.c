@@ -8,9 +8,7 @@ int ternOperator( int t );
 
 void sample()
 {
-    a = -12;
-//    if (!a && foo(a, &b) != -1)
-//        a++;
+
 }
 
 void empty(){}

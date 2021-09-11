@@ -155,6 +155,7 @@ function_entry:
 	BREAK ';' | CONTINUE ';' |
 	c_lang_operator ';' |
 	c_expr ';' |                                        // ...
+	/* empty */ ';' |
     /* empty */ ;
 
 c_lang_operator:
